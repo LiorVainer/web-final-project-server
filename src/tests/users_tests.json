@@ -1,0 +1,14 @@
+[
+  {
+    "email": "lior@gmail.com",
+    "password": "123456!",
+    "username": "lior",
+    "pictureId": "1"
+  },
+  {
+    "email": "rom@gmail.com",
+    "password": "123456",
+    "username": "rom",
+    "pictureId": "1"
+  }
+]
