@@ -2,7 +2,7 @@ import request from "supertest";
 import { initApp } from "../server";
 import mongoose from "mongoose";
 import { Express } from "express";
-import { UserModel } from "../models/user.model";
+import { UserRepository } from "../repositories/user.repository";
 import { UserWithTokens } from "../types/user.types";
 
 let app: Express;
@@ -19,7 +19,7 @@ const testUser: UserWithTokens = {
 beforeAll(async () => {
   console.log("beforeAll");
   app = await initApp();
-  await UserModel.deleteMany();
+  await UserRepository.deleteMany();
 });
 
 afterAll((done) => {

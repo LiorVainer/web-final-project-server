@@ -2,7 +2,7 @@ import request from "supertest";
 import { initApp } from "../server";
 import mongoose from "mongoose";
 import { Express } from "express";
-import { UserModel } from "../models/user.model";
+import { UserRepository } from "../repositories/user.repository";
 import { UserWithTokens } from "../types/user.types";
 import testUsers from "./users_tests.json";
 
@@ -17,7 +17,7 @@ const testUser: UserWithTokens = {
 
 beforeAll(async () => {
   app = await initApp();
-  await UserModel.deleteMany();
+  await UserRepository.deleteMany();
 
   const registerResponse = await request(app)
     .post("/auth/register")

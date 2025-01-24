@@ -1,7 +1,7 @@
 import { ParamsDictionary } from "express-serve-static-core";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import { UserModel } from "../models/user.model";
+import { UserRepository } from "../repositories/user.repository";
 import { CreateUserBody, UpdateUserBody } from "../types/user.types";
 
 export const createUser = async (
@@ -12,7 +12,7 @@ export const createUser = async (
     const { email, password } = req.body;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = await UserModel.create({
+    const newUser = await UserRepository.create({
       email,
       password: hashedPassword,
       username: req.body.username,
@@ -26,7 +26,7 @@ export const createUser = async (
 
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
-    const users = await UserModel.find({});
+    const users = await UserRepository.find({});
     res.status(200).send(users);
   } catch (err) {
     res.status(500).send({ message: "Error fetching users", error: err });
@@ -36,7 +36,7 @@ export const getAllUsers = async (_req: Request, res: Response) => {
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
-    const user = await UserModel.findById(userId);
+    const user = await UserRepository.findById(userId);
     if (!user) {
       res.status(404).send({ message: "User not found" });
       return;
@@ -55,7 +55,7 @@ export const updateUserById = async (
     const userId = req.params.id;
     const { email, password } = req.body;
 
-    const user = await UserModel.findById(userId);
+    const user = await UserRepository.findById(userId);
     if (!user) {
       res.status(404).send({ message: "User not found" });
       return;
@@ -77,7 +77,7 @@ export const updateUserById = async (
 export const deleteUserById = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
-    const user = await UserModel.findByIdAndDelete(userId);
+    const user = await UserRepository.findByIdAndDelete(userId);
     if (!user) {
       res.status(404).send({ message: "User not found" });
       return;

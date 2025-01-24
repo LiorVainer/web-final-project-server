@@ -1,27 +1,27 @@
-import { refresh } from "./../controllers/auth.controller";
-import mongoose, { Document, Schema } from "mongoose";
 import { z } from "zod";
-import { ObjectIdSchema, ObjectIdToString } from "../utils/zod.utils";
-import { User } from "../types/user.types";
+import { ObjectIdToString } from "../utils/zod.utils";
 
-const UserMongoSchema = new Schema(
-  {
-    username: { type: String, required: true },
-    password: { type: String, required: true },
-    email: { type: String, required: true },
-    pictureId: { type: String, required: true },
-    refreshTokens: { type: [String], default: [] },
-  },
-  {
-    timestamps: { createdAt: true, updatedAt: true },
-  }
-);
+export const UserSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+  email: z.string(),
+  pictureId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  refreshTokens: z.string().array().optional(),
+});
 
-export const UserModel = mongoose.model<User>("Users", UserMongoSchema);
-export type UserDocument = Document<unknown, {}, User> &
-  User &
-  Required<{
-    _id: string;
-  }> & {
-    __v: number;
-  };
+export type User = z.infer<typeof UserSchema>;
+
+export const UserWithId = UserSchema.extend({
+  _id: ObjectIdToString,
+});
+
+export type UserWithId = z.infer<typeof UserWithId>;
+
+export const UserWithoutTimestampsSchema = UserSchema.omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type UserPayload = z.infer<typeof UserWithoutTimestampsSchema>;

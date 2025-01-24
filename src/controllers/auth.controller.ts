@@ -2,7 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { ParamsDictionary } from "express-serve-static-core";
-import { UserDocument, UserModel } from "../models/user.model";
+import { UserDocument, UserRepository } from "../repositories/user.repository";
 import {
   RefreshResponse,
   RefreshTokenBody,
@@ -10,7 +10,7 @@ import {
   UserCredentials,
 } from "../types/auth.types";
 import { ObjectId } from "mongoose";
-import { User, UserPayload } from "../types/user.types";
+import { User, UserPayload } from "../models/user.model";
 
 export const register: RequestHandler<
   ParamsDictionary,
@@ -21,7 +21,7 @@ export const register: RequestHandler<
     const password = req.body.password;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    const user = await UserModel.create({
+    const user = await UserRepository.create({
       email: req.body.email,
       password: hashedPassword,
       username: req.body.username,
@@ -67,7 +67,7 @@ export const generateTokens = (userId: string): Tokens | null => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const user = await UserModel.findOne({ email: req.body.email });
+    const user = await UserRepository.findOne({ email: req.body.email });
     if (!user) {
       res.status(400).send("wrong username or password");
       return;
@@ -124,7 +124,7 @@ const verifyRefreshToken = async (refreshToken: string | undefined) => {
       refreshToken,
       process.env.TOKEN_SECRET
     ) as Payload;
-    user = await UserModel.findById(payload._id);
+    user = await UserRepository.findById(payload._id);
 
     if (!user) {
       return null;
