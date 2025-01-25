@@ -1,4 +1,4 @@
-import { generateObject, generateText, streamObject, streamText } from 'ai';
+import { CoreMessage, generateObject, generateText, streamObject, streamText } from 'ai';
 import { ZodSchema } from 'zod';
 import { AIConfigParams } from '../constants/ai.const';
 
@@ -8,6 +8,13 @@ export type SchemaConfig<T> = {
     schemaDescription?: string;
 };
 
+export type ObjectMethodConfig<T> = {
+    schema: ZodSchema<T>;
+    schemaName?: string;
+    schemaDescription?: string;
+    saveOutputToFile?: boolean;
+};
+
 type AIServiceMethods = {
     generateText: typeof generateText;
     streamText: typeof streamText;
@@ -15,9 +22,9 @@ type AIServiceMethods = {
     streamObject: typeof streamObject;
 };
 
-type AIServiceMethod = keyof AIServiceMethods;
+export type AIServiceMethod = keyof AIServiceMethods;
 
-export type AIServiceType = {
+export type AIServiceProviderInterface = {
     [K in keyof AIServiceMethods]: (...args: any) => any;
 };
 
@@ -32,4 +39,16 @@ export type AIGlobalConfig = Pick<
 
 export type AIServiceMethodsConfig = {
     [K in keyof AIServiceMethods]: Pick<Parameters<AIServiceMethods[K]>[0], (typeof AIConfigParams)[number]>;
+};
+
+export type SaveObjectMethodOutputToFileParams<T> = {
+    messages: CoreMessage[];
+    schema: SchemaConfig<T>['schema'];
+    object: T;
+    prompt?: string;
+    execution?: {
+        start: number;
+        end: number;
+    };
+    outputFolderPath?: string;
 };

@@ -24,7 +24,7 @@ export const getCurrentIpAddress = () => {
 
 export const getPublicIpAddress = async () => {
     try {
-        const response = await axios.get('https://api.ipify.org?format=json');
+        const response = await axios.get<{ ip: string }>('https://api.ipify.org?format=json');
         return response.data.ip; // Public IP address
     } catch (error) {
         console.error('Error fetching public IP:', error);

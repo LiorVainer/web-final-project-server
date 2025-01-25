@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { AIGlobalConfig, AIMethodConfigKeys, AIServiceMethodsConfig } from '../types/ai.types';
+import { AIGlobalConfig, AIMethodConfigKeys, AIServiceMethod, AIServiceMethodsConfig } from '../types/ai.types';
 
 const model = google('gemini-2.0-flash-exp');
 
@@ -24,3 +24,10 @@ export const AIConfig: AIServiceMethodsConfig = {
         ...GlobalConfig,
     },
 };
+
+export const AIServiceMethodToKebabCase = {
+    generateObject: 'generate-object',
+    generateText: 'generate-text',
+    streamObject: 'stream-object',
+    streamText: 'stream-text',
+} satisfies Record<AIServiceMethod, string>;

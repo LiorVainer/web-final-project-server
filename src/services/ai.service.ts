@@ -1,10 +1,11 @@
 import { CoreMessage, generateObject, generateText, streamObject, streamText } from 'ai';
 import { AIConfig } from '../constants/ai.const';
-import { AIServiceType, SchemaConfig } from '../types/ai.types';
+import { AIServiceProviderInterface, ObjectMethodConfig } from '../types/ai.types';
 import { getPublicIpAddress } from '../utils/ip.utils';
 import geoip from 'geoip-lite';
+import { AILogger } from '../loggers/ai.logger';
 
-class AIServiceProvider implements AIServiceType {
+class AIServiceProvider implements AIServiceProviderInterface {
     async generateText(prompt: string) {
         try {
             const { text } = await generateText({
@@ -37,8 +38,13 @@ class AIServiceProvider implements AIServiceType {
         }
     }
 
-    async generateObject<T>(prompt: string, { schema, schemaName, schemaDescription }: SchemaConfig<T>) {
+    async generateObject<T>(
+        prompt: string,
+        { schema, schemaName, schemaDescription, saveOutputToFile = false }: ObjectMethodConfig<T>
+    ) {
         try {
+            const start = new Date().getTime();
+
             const metadataMessages = await this.generateMetadataMessages();
             const configMessages = (AIConfig.generateObject.messages ?? []) as CoreMessage[];
             const userMessage: CoreMessage = { role: 'user', content: prompt };
@@ -53,7 +59,17 @@ class AIServiceProvider implements AIServiceType {
                 messages,
             });
 
-            console.log({ request });
+            const end = new Date().getTime();
+
+            if (saveOutputToFile) {
+                AILogger.saveObjectMethodOutputToFile('generateObject', {
+                    messages,
+                    prompt,
+                    schema,
+                    object,
+                    execution: { start, end },
+                });
+            }
 
             return object;
         } catch (error) {
@@ -62,10 +78,15 @@ class AIServiceProvider implements AIServiceType {
         }
     }
 
-    async streamObject<T>(prompt: string, { schema, schemaName, schemaDescription }: SchemaConfig<T>) {
+    async streamObject<T>(
+        prompt: string,
+        { schema, schemaName, schemaDescription, saveOutputToFile = false }: ObjectMethodConfig<T>
+    ) {
         try {
-            const metadataMessages = await this.generateMetadataMessages();
+            const start = new Date().getTime();
+
             const configMessages = (AIConfig.generateObject.messages ?? []) as CoreMessage[];
+            const metadataMessages = await this.generateMetadataMessages();
             const userMessage: CoreMessage = { role: 'user', content: prompt };
 
             const messages: CoreMessage[] = [...configMessages, ...metadataMessages, userMessage];
@@ -73,7 +94,7 @@ class AIServiceProvider implements AIServiceType {
             const { partialObjectStream, object } = streamObject({
                 ...AIConfig.streamObject,
                 schema,
-                schemaName: schema._def.description,
+                schemaName: schemaName ?? schema._def.description,
                 schemaDescription: schemaDescription ?? schema._def.description,
                 messages,
             });
@@ -82,7 +103,18 @@ class AIServiceProvider implements AIServiceType {
                 console.log(partialObject);
             }
 
-            return object;
+            if (saveOutputToFile) {
+                const end = new Date().getTime();
+                AILogger.saveObjectMethodOutputToFile('streamObject', {
+                    messages,
+                    prompt,
+                    schema,
+                    object: await object,
+                    execution: { start, end },
+                });
+            }
+
+            return await object;
         } catch (error) {
             console.log('Error Trying To Generate Text From AI Model', error);
             throw error;

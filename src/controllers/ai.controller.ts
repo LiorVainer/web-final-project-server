@@ -28,7 +28,10 @@ export const streamText = async (req: Request, res: Response) => {
 
 export const generateObject = async (req: Request, res: Response) => {
     try {
-        const object = await AIService.generateObject(req.body.prompt, { schema: FiltersSchema });
+        const object = await AIService.generateObject(req.body.prompt, {
+            schema: FiltersSchema,
+            saveOutputToFile: true,
+        });
         res.status(200).send(object);
     } catch (err) {
         res.status(500).send({
@@ -42,6 +45,7 @@ export const generateStreamObject = async (req: Request, res: Response) => {
     try {
         const object = await AIService.streamObject(req.body.prompt, {
             schema: FiltersSchema,
+            saveOutputToFile: true,
         });
         res.status(200).send(object);
     } catch (err) {
