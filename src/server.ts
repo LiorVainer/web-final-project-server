@@ -3,6 +3,7 @@ import express, {Express} from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.route";
 import usersRoutes from "./routes/users.route";
+import aiRoutes from "./routes/ai.route";
 import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
@@ -33,6 +34,7 @@ db.once("open", () => console.log("Connected to database"));
 
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
+app.use("/ai", aiRoutes);
 
 export const initApp = async (): Promise<Express> => {
     const dbConnect = process.env.DB_CONNECT;
