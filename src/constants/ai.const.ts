@@ -3,11 +3,12 @@ import { AIGlobalConfig, AIMethodConfigKeys, AIServiceMethod, AIServiceMethodsCo
 
 const model = google('gemini-2.0-flash-exp');
 
-export const AIConfigParams = ['model', 'maxTokens', 'messages'] satisfies AIMethodConfigKeys[];
+export const AIConfigParams = ['model', 'maxTokens', 'messages', 'temperature'] satisfies AIMethodConfigKeys[];
 
 export const GlobalConfig: AIGlobalConfig = {
     model,
     maxTokens: 1000,
+    temperature: 0,
 };
 
 export const AIConfig: AIServiceMethodsConfig = {

@@ -50,5 +50,6 @@ export type SaveObjectMethodOutputToFileParams<T> = {
         start: number;
         end: number;
     };
+    finishReason?: string;
     outputFolderPath?: string;
 };

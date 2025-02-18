@@ -11,6 +11,8 @@ class AIServiceProvider implements AIServiceProviderInterface {
             const { text } = await generateText({
                 ...AIConfig.generateText,
                 prompt,
+                messages: [],
+                maxTokens: 1000,
             });
 
             return text;
@@ -51,7 +53,7 @@ class AIServiceProvider implements AIServiceProviderInterface {
 
             const messages: CoreMessage[] = [...configMessages, ...metadataMessages, userMessage];
 
-            const { object, request } = await generateObject({
+            const { object, finishReason } = await generateObject({
                 ...AIConfig.generateObject,
                 schema,
                 schemaName,
@@ -67,6 +69,7 @@ class AIServiceProvider implements AIServiceProviderInterface {
                     prompt,
                     schema,
                     object,
+                    finishReason,
                     execution: { start, end },
                 });
             }

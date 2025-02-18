@@ -9,7 +9,15 @@ const BASE_OUTPUT_FOLDER_PATH = './output';
 class AILoggerProvider {
     saveObjectMethodOutputToFile<T>(
         method: AIServiceMethod,
-        { messages, prompt, schema, object, execution, outputFolderPath }: SaveObjectMethodOutputToFileParams<T>
+        {
+            messages,
+            prompt,
+            schema,
+            object,
+            execution,
+            outputFolderPath,
+            finishReason,
+        }: SaveObjectMethodOutputToFileParams<T>
     ) {
         const userPrompt = prompt ?? messages.find((message) => message.role === 'user')?.content;
         const systemMessages = messages
@@ -32,9 +40,10 @@ class AILoggerProvider {
             userPrompt,
             responseObject: object,
             schema: zodToJsonSchema(schema),
+            ...(finishReason && { finishReason }),
         };
 
-        const fileName = `${AIServiceMethodToKebabCase[method]}-${formatDate(new Date(), DATE_AND_TIME_JSON_FORMAT)}.json`;
+        const fileName = `${schema._def.description?.substring(0, 20) ?? ''}-${AIServiceMethodToKebabCase[method]}-${formatDate(new Date(), DATE_AND_TIME_JSON_FORMAT)}.json`;
         const outputFullPath = `${outputFolderPath ?? BASE_OUTPUT_FOLDER_PATH}/${fileName}`;
 
         fs.writeFileSync(outputFullPath, JSON.stringify(output));
