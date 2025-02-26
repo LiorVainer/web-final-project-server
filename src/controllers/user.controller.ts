@@ -1,17 +1,16 @@
-import { ParamsDictionary } from "express-serve-static-core";
 import { Request, Response } from "express";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import { UserRepository } from "../repositories/user.repository";
 import { CreateUserBody, UpdateUserBody } from "../types/user.types";
 
 export const createUser = async (
   req: Request<{}, {}, CreateUserBody>,
-  res: Response
+  res: Response,
 ) => {
   try {
     const { email, password } = req.body;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
     const newUser = await UserRepository.create({
       email,
       password: hashedPassword,
@@ -48,8 +47,8 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const updateUserById = async (
-  req: Request<ParamsDictionary, {}, UpdateUserBody>,
-  res: Response
+  req: Request<Record<any, any>, {}, UpdateUserBody>,
+  res: Response,
 ) => {
   try {
     const userId = req.params.id;
@@ -63,8 +62,8 @@ export const updateUserById = async (
 
     if (email) user.email = email;
     if (password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
+      const salt = await bcryptjs.genSalt(10);
+      user.password = await bcryptjs.hash(password, salt);
     }
 
     await user.save();
