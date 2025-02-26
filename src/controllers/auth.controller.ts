@@ -1,26 +1,19 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { ParamsDictionary } from "express-serve-static-core";
 import { UserDocument, UserRepository } from "../repositories/user.repository";
-import {
-  RefreshResponse,
-  RefreshTokenBody,
-  Tokens,
-  UserCredentials,
-} from "../types/auth.types";
-import { ObjectId } from "mongoose";
+import { RefreshResponse, RefreshTokenBody, Tokens } from "../types/auth.types";
 import { User, UserPayload } from "../models/user.model";
 
 export const register: RequestHandler<
-  ParamsDictionary,
+  Record<any, any>,
   User | unknown,
   UserPayload
 > = async (req, res) => {
   try {
     const password = req.body.password;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
     const user = await UserRepository.create({
       email: req.body.email,
       password: hashedPassword,
@@ -47,7 +40,7 @@ export const generateTokens = (userId: string): Tokens | null => {
       random,
     },
     process.env.TOKEN_SECRET,
-    { expiresIn: process.env.TOKEN_EXPIRES as SignOptions["expiresIn"] }
+    { expiresIn: process.env.TOKEN_EXPIRES as SignOptions["expiresIn"] },
   );
 
   const refreshToken = jwt.sign(
@@ -56,7 +49,9 @@ export const generateTokens = (userId: string): Tokens | null => {
       random,
     },
     process.env.TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions["expiresIn"] }
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions["expiresIn"],
+    },
   );
 
   return {
@@ -72,9 +67,9 @@ export const login = async (req: Request, res: Response) => {
       res.status(400).send("wrong username or password");
       return;
     }
-    const validPassword = await bcrypt.compare(
+    const validPassword = await bcryptjs.compare(
       req.body.password,
-      user.password
+      user.password,
     );
     if (!validPassword) {
       res.status(400).send("wrong username or password");
@@ -122,7 +117,7 @@ const verifyRefreshToken = async (refreshToken: string | undefined) => {
   try {
     const payload = jwt.verify(
       refreshToken,
-      process.env.TOKEN_SECRET
+      process.env.TOKEN_SECRET,
     ) as Payload;
     user = await UserRepository.findById(payload._id);
 
@@ -138,7 +133,7 @@ const verifyRefreshToken = async (refreshToken: string | undefined) => {
 
     // update user refresh tokens array to be the same as before except the current refresh token
     user.refreshTokens = user.refreshTokens?.filter(
-      (token) => token !== refreshToken
+      (token) => token !== refreshToken,
     );
   } catch (err) {
     return null;
@@ -162,7 +157,7 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 export const refresh: RequestHandler<
-  ParamsDictionary,
+  Record<any, any>,
   RefreshResponse | string,
   RefreshTokenBody
 > = async (req, res) => {
@@ -204,7 +199,7 @@ type Payload = {
 export const authMiddleware = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const authorization = req.header("authorization");
 
