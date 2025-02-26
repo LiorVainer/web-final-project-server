@@ -3,12 +3,16 @@ import express, {Express} from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.route";
 import usersRoutes from "./routes/users.route";
+import recommendationRoutes from "./routes/recommendation.route";
 import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
+import cors from "cors";
+import {handleErrorMiddleware} from "./middlewares/error.middleware";
 
 dotenv.config();
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -33,6 +37,7 @@ db.once("open", () => console.log("Connected to database"));
 
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
+app.use("/recommendations", recommendationRoutes);
 
 export const initApp = async (): Promise<Express> => {
     const dbConnect = process.env.DB_CONNECT;
@@ -47,3 +52,5 @@ export const initApp = async (): Promise<Express> => {
         throw error;
     }
 };
+
+app.use(handleErrorMiddleware)
