@@ -3,13 +3,14 @@ import { Recommendation } from "../models/recommendation.model";
 
 const RecommendationMongoSchema = new Schema(
   {
-    matchId: { type: Schema.Types.ObjectId, ref: "Match", required: true },
+    // matchId: { type: Schema.Types.ObjectId, ref: "Match", required: true },
+    matchId: { type: String, required: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     likes: [{ type: [String], default: [] }],
     comments: { type: [String], default: [] },
-    pictureId: { type: String, required: false },
+    picture: { type: String }, //! give it a type of picture
   },
   {
     timestamps: { createdAt: true, updatedAt: true },

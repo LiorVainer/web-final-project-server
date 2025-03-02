@@ -9,7 +9,7 @@ const RecommendationSchema = z.object({
   createdBy: z.any(),
   likes: z.array(z.string()),
   comments: z.array(z.string()),
-  pictureId: z.string().optional(),
+  picture: z.string().optional(), //! give it a type of picture
   createdAt: z.date(),
   updatedAt: z.date(),
 });
