@@ -6,7 +6,7 @@ const MatchMongoSchema = new Schema(
     homeTeam: { type: String, required: true },
     awayTeam: { type: String, required: true },
     date: { type: Date, required: true },
-    competition: { type: String, required: true },
+    league: { type: String, required: true },
     country: { type: String, required: true },
     stadium: { type: String, required: true },
   },

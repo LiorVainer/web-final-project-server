@@ -5,7 +5,7 @@ export const MatchSchema = z.object({
   homeTeam: z.string(),
   awayTeam: z.string(),
   date: z.date(),
-  competition: z.string(),
+  league: z.string(),
   country: z.string(),
   stadium: z.string(),
   createdAt: z.date(),
