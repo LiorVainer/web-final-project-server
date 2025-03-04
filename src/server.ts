@@ -10,7 +10,8 @@ import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
 import cors from "cors";
 import { handleErrorMiddleware } from "./middlewares/error.middleware";
-import router from "./routes/file.route";
+import fileRoutes from "./routes/file.route";
+import soccerRoutes from "./routes/soccer.route";
 
 dotenv.config();
 const app = express();
@@ -41,7 +42,8 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/recommendations", recommendationRoutes);
 app.use("/matches", matchRoutes);
-app.use("/file", router);
+app.use("/soccer", soccerRoutes);
+app.use("/file", fileRoutes);
 app.use("/public", express.static("public"));
 
 export const initApp = async (): Promise<Express> => {
