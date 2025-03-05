@@ -3,13 +3,18 @@ import { ObjectIdToString } from "../utils/zod.utils";
 
 
 const RecommendationSchema = z.object({
-  matchId: z.any(),
+  homeTeam: z.string(),
+  awayTeam: z.string(),
+  matchDate: z.date(),
+  league: z.string(),
+  country: z.string(),
+  stadium: z.string(),
   title: z.string(),
   description: z.string(),
   createdBy: z.any(),
   likes: z.array(z.string()),
   comments: z.array(z.string()),
-  picture: z.string().optional(), //! give it a type of picture
+  picture: z.string().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

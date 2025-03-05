@@ -3,14 +3,18 @@ import { Recommendation } from "../models/recommendation.model";
 
 const RecommendationMongoSchema = new Schema(
   {
-    // matchId: { type: Schema.Types.ObjectId, ref: "Match", required: true },
-    matchId: { type: String, required: true },
+    homeTeam: { type: String, required: true },
+    awayTeam: { type: String, required: true },
+    matchDate: { type: Date, required: true },
+    league: { type: String, required: true },
+    country: { type: String, required: true },
+    stadium: { type: String, required: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
     likes: [{ type: [String], default: [] }],
     comments: { type: [String], default: [] },
-    picture: { type: String }, //! give it a type of picture
+    picture: { type: String },
   },
   {
     timestamps: { createdAt: true, updatedAt: true },

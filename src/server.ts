@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import authRoutes from "./routes/auth.route";
 import usersRoutes from "./routes/users.route";
 import recommendationRoutes from "./routes/recommendation.route";
-import matchRoutes from "./routes/match.route";
 import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
@@ -23,7 +22,7 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Assignment Two REST API",
+      title: " Sport Scanner REST API",
       version: "1.0.0",
       description: "REST server including authentication using JWT",
     },
@@ -41,7 +40,6 @@ db.once("open", () => console.log("Connected to database"));
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/recommendations", recommendationRoutes);
-app.use("/matches", matchRoutes);
 app.use("/soccer", soccerRoutes);
 app.use("/file", fileRoutes);
 app.use("/public", express.static("public"));
