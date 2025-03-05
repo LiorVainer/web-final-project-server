@@ -1,4 +1,4 @@
-import { CoreMessage, generateObject, generateText, streamObject, streamText } from 'ai';
+import { CoreMessage, CoreSystemMessage, generateObject, generateText, streamObject, streamText } from 'ai';
 import { ZodSchema } from 'zod';
 import { AIConfigParams } from '../constants/ai.const';
 
@@ -11,7 +11,13 @@ export type SchemaConfig<T> = {
 export type ObjectMethodConfig<T> = {
     schema: ZodSchema<T>;
     schemaName?: string;
+    systemMessages?: CoreSystemMessage[];
     schemaDescription?: string;
+    saveOutputToFile?: boolean;
+};
+
+export type TextMethodConfig = {
+    systemMessages?: CoreSystemMessage[];
     saveOutputToFile?: boolean;
 };
 
@@ -41,15 +47,24 @@ export type AIServiceMethodsConfig = {
     [K in keyof AIServiceMethods]: Pick<Parameters<AIServiceMethods[K]>[0], (typeof AIConfigParams)[number]>;
 };
 
-export type SaveObjectMethodOutputToFileParams<T> = {
+export type ExecutionTime = {
+    start: number;
+    end: number;
+};
+
+export type BaseOutputToFileParams = {
     messages: CoreMessage[];
-    schema: SchemaConfig<T>['schema'];
-    object: T;
     prompt?: string;
-    execution?: {
-        start: number;
-        end: number;
-    };
+    execution?: ExecutionTime;
     finishReason?: string;
     outputFolderPath?: string;
+};
+
+export type SaveObjectMethodOutputToFileParams<T> = BaseOutputToFileParams & {
+    schema: SchemaConfig<T>['schema'];
+    object: T;
+};
+
+export type SaveTextMethodOutputToFileParams = BaseOutputToFileParams & {
+    responseText: string;
 };

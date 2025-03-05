@@ -1,8 +1,14 @@
-import { AIServiceMethod, SaveObjectMethodOutputToFileParams } from '../types/ai.types';
+import {
+    AIServiceMethod,
+    ExecutionTime,
+    SaveObjectMethodOutputToFileParams,
+    SaveTextMethodOutputToFileParams,
+} from '../types/ai.types';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import fs from 'fs';
 import { DATE_AND_TIME_JSON_FORMAT, formatDate } from '../utils/date.utils';
 import { AIServiceMethodToKebabCase } from '../constants/ai.const';
+import { CoreMessage } from 'ai';
 
 const BASE_OUTPUT_FOLDER_PATH = './output';
 
@@ -19,13 +25,11 @@ class AILoggerProvider {
             finishReason,
         }: SaveObjectMethodOutputToFileParams<T>
     ) {
-        const userPrompt = prompt ?? messages.find((message) => message.role === 'user')?.content;
-        const systemMessages = messages
-            .filter((message) => message.role === 'system')
-            .map((message) => message.content);
-
-        const executionTimeInMilliseconds = execution ? execution.end - execution.start : 0;
-        const executionTimeInSeconds = executionTimeInMilliseconds / 1000;
+        const { userPrompt, systemMessages, executionTimeInSeconds } = this.generateLogMetadata(
+            messages,
+            prompt,
+            execution
+        );
 
         const output = {
             ...(execution && {
@@ -48,6 +52,54 @@ class AILoggerProvider {
 
         fs.writeFileSync(outputFullPath, JSON.stringify(output));
     }
+
+    saveTextMethodOutputToFile(
+        method: AIServiceMethod,
+        { messages, responseText, prompt, execution, outputFolderPath, finishReason }: SaveTextMethodOutputToFileParams
+    ) {
+        const { userPrompt, systemMessages, executionTimeInSeconds } = this.generateLogMetadata(
+            messages,
+            prompt,
+            execution
+        );
+
+        const output = {
+            ...(execution && {
+                execution: {
+                    duration: executionTimeInSeconds,
+                    units: 'seconds',
+                    start: new Date(execution.start).toLocaleString(),
+                    end: new Date(execution.end).toLocaleString(),
+                },
+            }),
+            systemMessages,
+            userPrompt,
+            responseText,
+            ...(finishReason && { finishReason }),
+        };
+
+        const fileName = `${AIServiceMethodToKebabCase[method]}-${formatDate(new Date(), DATE_AND_TIME_JSON_FORMAT)}.json`;
+        const outputFullPath = `${outputFolderPath ?? BASE_OUTPUT_FOLDER_PATH}/${fileName}`;
+
+        console.log(output, outputFullPath);
+        fs.writeFileSync(outputFullPath, JSON.stringify(output));
+    }
+
+    generateLogMetadata = (messages: CoreMessage[], prompt?: string, execution?: ExecutionTime) => {
+        const userPrompt = prompt ?? messages.find((message) => message.role === 'user')?.content;
+        const systemMessages = messages
+            .filter((message) => message.role === 'system')
+            .map((message) => message.content);
+
+        const executionTimeInMilliseconds = execution ? execution.end - execution.start : 0;
+        const executionTimeInSeconds = executionTimeInMilliseconds / 1000;
+
+        return {
+            userPrompt,
+            systemMessages,
+            executionTimeInSeconds,
+        };
+    };
 
     create() {
         return new AILoggerProvider();
