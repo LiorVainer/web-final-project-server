@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { matchExperienceController } from "../controllers/matchExperience.controller";
+import { matchExperienceController } from "../controllers/match-experience.controller";
 
 const router = Router();
 
@@ -101,7 +101,7 @@ const router = Router();
 
 /**
  * @swagger
- * /matchExperiences:
+ * /match-experiences:
  *   post:
  *     summary: Create a new matchExperience
  *     tags: [MatchExperiences]
@@ -152,7 +152,7 @@ router.post("/", matchExperienceController.createMatchExperience);
 
 /**
  * @swagger
- * /matchExperiences:
+ * /match-experiences:
  *   get:
  *     summary: Get all matchExperiences
  *     tags: [MatchExperiences]
@@ -172,7 +172,7 @@ router.get("/", matchExperienceController.getAll);
 
 /**
  * @swagger
- * /matchExperiences/{id}:
+ * /match-experiences/{id}:
  *   get:
  *     summary: Get a matchExperience by ID
  *     tags: [MatchExperiences]
@@ -199,7 +199,7 @@ router.get("/:id", matchExperienceController.getMatchExperienceById);
 
 /**
  * @swagger
- * /matchExperiences/{id}:
+ * /match-experiences/{id}:
  *   put:
  *     summary: Update a matchExperience by ID
  *     tags: [MatchExperiences]
@@ -250,7 +250,7 @@ router.put("/:id", matchExperienceController.updateMatchExperience);
 
 /**
  * @swagger
- * /matchExperiences/{id}:
+ * /match-experiences/{id}:
  *   delete:
  *     summary: Delete a matchExperience by ID
  *     tags: [MatchExperiences]
@@ -273,7 +273,7 @@ router.delete("/:id", matchExperienceController.deleteMatchExperience);
 
 /**
  * @swagger
- * /matchExperiences/{id}/comments:
+ * /match-experiences/{id}/comments:
  *   post:
  *     summary: Add a comment to a matchExperience
  *     tags: [MatchExperiences]
@@ -310,7 +310,7 @@ router.post("/:id/comments", matchExperienceController.addComment);
 
 /**
  * @swagger
- * /matchExperiences/{id}/like:
+ * /match-experiences/{id}/like:
  *   post:
  *     summary: Like a matchExperience
  *     tags: [MatchExperiences]
@@ -344,7 +344,7 @@ router.post("/:id/like", matchExperienceController.likeMatchExperience);
 
 /**
  * @swagger
- * /matchExperiences/{id}/unlike:
+ * /match-experiences/{id}/unlike:
  *   post:
  *     summary: Unlike a matchExperience
  *     tags: [MatchExperiences]

@@ -3,7 +3,7 @@ import express, { Express } from "express";
 import mongoose from "mongoose";
 import authRoutes from "./routes/auth.route";
 import usersRoutes from "./routes/users.route";
-import matchExperienceRoutes from "./routes/matchExperience.route";
+import matchExperienceRoutes from "./routes/match-experience.route";
 import dotenv from "dotenv";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerUI from "swagger-ui-express";
@@ -39,7 +39,7 @@ db.once("open", () => console.log("Connected to database"));
 
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
-app.use("/matchExperiences", matchExperienceRoutes);
+app.use("/match-experiences", matchExperienceRoutes);
 app.use("/soccer", soccerRoutes);
 app.use("/file", fileRoutes);
 app.use("/public", express.static("public"));

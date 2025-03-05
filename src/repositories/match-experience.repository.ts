@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { MatchExperience } from "../models/matchExperience.model";
+import { MatchExperience } from "../models/match-experience.model";
 
 const MatchExperienceMongoSchema = new Schema(
   {

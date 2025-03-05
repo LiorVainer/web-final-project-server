@@ -2,7 +2,7 @@ import request from "supertest";
 import { initApp } from "../server";
 import mongoose from "mongoose";
 import { Express } from "express";
-import { MatchExperienceRepository } from "../repositories/matchExperience.repository";
+import { MatchExperienceRepository } from "../repositories/match-experience.repository";
 import { UserRepository } from "../repositories/user.repository";
 
 let app: Express;
@@ -51,7 +51,7 @@ afterAll(async () => {
 describe("MatchExperience API Integration Tests", () => {
   test("creates a new matchExperience", async () => {
     const response = await request(app)
-      .post("/matchExperiences")
+      .post("/match-experiences")
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({
         ...testMatchExperience,
@@ -65,7 +65,7 @@ describe("MatchExperience API Integration Tests", () => {
   });
 
   test("retrieves all matchExperiences", async () => {
-    const response = await request(app).get("/matchExperiences");
+    const response = await request(app).get("/match-experiences");
 
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBeGreaterThanOrEqual(1);
@@ -73,7 +73,7 @@ describe("MatchExperience API Integration Tests", () => {
 
   test("retrieves a matchExperience by ID", async () => {
     const response = await request(app).get(
-      `/matchExperiences/${matchExperienceId}`
+      `/match-experiences/${matchExperienceId}`
     );
 
     expect(response.statusCode).toBe(200);
@@ -82,7 +82,7 @@ describe("MatchExperience API Integration Tests", () => {
 
   test("updates a matchExperience", async () => {
     const response = await request(app)
-      .put(`/matchExperiences/${matchExperienceId}`)
+      .put(`/match-experiences/${matchExperienceId}`)
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({ title: "Updated MatchExperience Title" });
 
@@ -92,7 +92,7 @@ describe("MatchExperience API Integration Tests", () => {
 
   test("adds a comment to a matchExperience", async () => {
     const response = await request(app)
-      .post(`/matchExperiences/${matchExperienceId}/comments`)
+      .post(`/match-experiences/${matchExperienceId}/comments`)
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({ userId: "testUserId", content: "Great match!" });
 
@@ -102,7 +102,7 @@ describe("MatchExperience API Integration Tests", () => {
 
   test("likes a matchExperience", async () => {
     const response = await request(app)
-      .post(`/matchExperiences/${matchExperienceId}/like`)
+      .post(`/match-experiences/${matchExperienceId}/like`)
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({ userId: "testUserId" });
 
@@ -112,7 +112,7 @@ describe("MatchExperience API Integration Tests", () => {
 
   test("unlikes a matchExperience", async () => {
     const response = await request(app)
-      .post(`/matchExperiences/${matchExperienceId}/unlike`)
+      .post(`/match-experiences/${matchExperienceId}/unlike`)
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({ userId: "testUserId" });
 
@@ -122,7 +122,7 @@ describe("MatchExperience API Integration Tests", () => {
 
   test("deletes a matchExperience", async () => {
     const response = await request(app)
-      .delete(`/matchExperiences/${matchExperienceId}`)
+      .delete(`/match-experiences/${matchExperienceId}`)
       .set("Authorization", `JWT ${userAccessToken}`);
 
     expect(response.statusCode).toBe(200);

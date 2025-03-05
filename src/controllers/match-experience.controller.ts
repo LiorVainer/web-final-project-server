@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { MatchExperienceRepository } from "../repositories/matchExperience.repository";
+import { MatchExperienceRepository } from "../repositories/match-experience.repository";
 
 // Controller object for matchExperience endpoints
 export const matchExperienceController = {

@@ -14,6 +14,12 @@ export const soccerApiClient = axios.create({
   },
 });
 
+type LeaguesResponse = {
+  data: {
+     response: { league: League; country: Country }[]
+  }
+}
+
 export const soccerController = {
   getCountries: async (_req: Request, res: Response) => {
     const response = await soccerApiClient.get("/countries");
