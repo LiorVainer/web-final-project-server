@@ -45,7 +45,9 @@ export const generateTokens = (userId: string): Tokens | null => {
             random,
         },
         process.env.TOKEN_SECRET,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'] }
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'],
+        }
     );
 
     return {
