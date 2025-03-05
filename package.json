@@ -8,6 +8,7 @@
     "test": "jest --detectOpenHandles --forceExit --runInBand",
     "test:auth": "jest --detectOpenHandles --forceExit tests/auth.test.ts",
     "test:users": "jest --detectOpenHandles --forceExit tests/users.test.ts",
+    "test:recommendations": "jest --detectOpenHandles --forceExit tests/recommendations.test.ts",
     "test:coverage": "jest --coverage --runInBand --coverageDirectory=coverage"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "multer": "^1.4.5-lts.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "ts-node": "^10.9.2",
     "uuid": "^11.0.5",
     "zod": "^3.24.1"
   },
@@ -35,12 +37,12 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^1.4.12",
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.7",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
     "@typescript-eslint/parser": "^8.17.0",
-    "@types/multer": "^1.4.12",
     "eslint": "^9.16.0",
     "jest": "^29.7.0",
     "nodemon": "^3.1.7",

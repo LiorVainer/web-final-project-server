@@ -12,7 +12,7 @@ const RecommendationMongoSchema = new Schema(
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     description: { type: String, required: true },
-    likes: [{ type: [String], default: [] }],
+    likes: { type: [String], default: [] },
     comments: { type: [String], default: [] },
     picture: { type: String },
   },

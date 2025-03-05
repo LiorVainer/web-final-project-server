@@ -80,10 +80,9 @@ export const recommendationController = {
       const recommendationId = req.params.id;
       const { userId, content } = req.body;
 
-      // Create a new comment subdocument
       const comment = {
         _id: uuidv4(),
-        postId: recommendationId,
+        recommendationId,
         userId,
         content,
         createdAt: new Date(),
@@ -94,6 +93,7 @@ export const recommendationController = {
         { $push: { comments: comment } },
         { new: true }
       );
+
       if (!recommendation) {
         res.status(404).send("Recommendation not found");
         return;
