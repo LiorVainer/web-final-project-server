@@ -8,7 +8,7 @@
     "test": "jest --detectOpenHandles --forceExit --runInBand",
     "test:auth": "jest --detectOpenHandles --forceExit tests/auth.test.ts",
     "test:users": "jest --detectOpenHandles --forceExit tests/users.test.ts",
-    "test:recommendations": "jest --detectOpenHandles --forceExit tests/recommendations.test.ts",
+    "test:matchExperiences": "jest --detectOpenHandles --forceExit tests/matchExperiences.test.ts",
     "test:coverage": "jest --coverage --runInBand --coverageDirectory=coverage"
   },
   "dependencies": {

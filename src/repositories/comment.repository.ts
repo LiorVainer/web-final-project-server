@@ -3,7 +3,7 @@ import { Comment } from "../models/comment.model";
 
 const CommentMongoSchema = new Schema(
   {
-    recommendationId: { type: String, required: true },
+    matchExperienceId: { type: String, required: true },
     userId: { type: String, required: true },
     content: { type: String, required: true },
   },

@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { recommendationController } from "../controllers/recommendation.controller";
+import { matchExperienceController } from "../controllers/matchExperience.controller";
 
 const router = Router();
 
 /**
  * @swagger
  * tags:
- *   name: Recommendations
- *   description: Recommendation management API
+ *   name: MatchExperiences
+ *   description: MatchExperience management API
  */
 
 /**
@@ -17,14 +17,14 @@ const router = Router();
  *     Comment:
  *       type: object
  *       required:
- *         - recommendationId
+ *         - matchExperienceId
  *         - userId
  *         - content
  *         - createdAt
  *       properties:
- *         recommendationId:
+ *         matchExperienceId:
  *           type: string
- *           description: The ID of the recommendation being commented on
+ *           description: The ID of the matchExperience being commented on
  *         userId:
  *           type: string
  *           description: The ID of the user who made the comment
@@ -36,7 +36,7 @@ const router = Router();
  *           format: date-time
  *           description: The timestamp when the comment was created
 
- *     Recommendation:
+ *     MatchExperience:
  *       type: object
  *       required:
  *         - homeTeam
@@ -69,43 +69,42 @@ const router = Router();
  *           description: The stadium where the match will be held
  *         title:
  *           type: string
- *           description: The title of the recommendation
+ *           description: The title of the matchExperience
  *         description:
  *           type: string
- *           description: A detailed description of the recommendation
+ *           description: A detailed description of the matchExperience
  *         createdBy:
  *           type: string
- *           description: The ID of the user who created the recommendation
+ *           description: The ID of the user who created the matchExperience
  *         likes:
  *           type: array
  *           items:
  *             type: string
- *           description: A list of user IDs who liked the recommendation
+ *           description: A list of user IDs who liked the matchExperience
  *         comments:
  *           type: array
  *           items:
  *             type: string
- *           description: A list of comment IDs associated with the recommendation
+ *           description: A list of comment IDs associated with the matchExperience
  *         picture:
  *           type: string
- *           description: Optional picture URL for the recommendation
+ *           description: Optional picture URL for the matchExperience
  *         createdAt:
  *           type: string
  *           format: date-time
- *           description: The time when the recommendation was created
+ *           description: The time when the matchExperience was created
  *         updatedAt:
  *           type: string
  *           format: date-time
- *           description: The time when the recommendation was last updated
+ *           description: The time when the matchExperience was last updated
  */
-
 
 /**
  * @swagger
- * /recommendations:
+ * /matchExperiences:
  *   post:
- *     summary: Create a new recommendation
- *     tags: [Recommendations]
+ *     summary: Create a new matchExperience
+ *     tags: [MatchExperiences]
  *     requestBody:
  *       required: true
  *       content:
@@ -141,76 +140,76 @@ const router = Router();
  *                 type: string
  *     responses:
  *       200:
- *         description: The created recommendation
+ *         description: The created matchExperience
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Recommendation'
+ *               $ref: '#/components/schemas/MatchExperience'
  *       500:
- *         description: Error creating recommendation
+ *         description: Error creating matchExperience
  */
-router.post("/", recommendationController.createRecommendation);
+router.post("/", matchExperienceController.createMatchExperience);
 
 /**
  * @swagger
- * /recommendations:
+ * /matchExperiences:
  *   get:
- *     summary: Get all recommendations
- *     tags: [Recommendations]
+ *     summary: Get all matchExperiences
+ *     tags: [MatchExperiences]
  *     responses:
  *       200:
- *         description: A list of recommendations
+ *         description: A list of matchExperiences
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/Recommendation'
+ *                 $ref: '#/components/schemas/MatchExperience'
  *       500:
- *         description: Error fetching recommendations
+ *         description: Error fetching matchExperiences
  */
-router.get("/", recommendationController.getAll);
+router.get("/", matchExperienceController.getAll);
 
 /**
  * @swagger
- * /recommendations/{id}:
+ * /matchExperiences/{id}:
  *   get:
- *     summary: Get a recommendation by ID
- *     tags: [Recommendations]
+ *     summary: Get a matchExperience by ID
+ *     tags: [MatchExperiences]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: The recommendation ID
+ *         description: The matchExperience ID
  *     responses:
  *       200:
- *         description: The recommendation data
+ *         description: The matchExperience data
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Recommendation'
+ *               $ref: '#/components/schemas/MatchExperience'
  *       404:
- *         description: Recommendation not found
+ *         description: MatchExperience not found
  *       500:
- *         description: Error fetching recommendation
+ *         description: Error fetching matchExperience
  */
-router.get("/:id", recommendationController.getRecommendationById);
+router.get("/:id", matchExperienceController.getMatchExperienceById);
 
 /**
  * @swagger
- * /recommendations/{id}:
+ * /matchExperiences/{id}:
  *   put:
- *     summary: Update a recommendation by ID
- *     tags: [Recommendations]
+ *     summary: Update a matchExperience by ID
+ *     tags: [MatchExperiences]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: The recommendation ID
+ *         description: The matchExperience ID
  *     requestBody:
  *       required: true
  *       content:
@@ -237,54 +236,54 @@ router.get("/:id", recommendationController.getRecommendationById);
  *                 type: string
  *     responses:
  *       200:
- *         description: The updated recommendation
+ *         description: The updated matchExperience
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Recommendation'
+ *               $ref: '#/components/schemas/MatchExperience'
  *       404:
- *         description: Recommendation not found
+ *         description: MatchExperience not found
  *       500:
- *         description: Error updating recommendation
+ *         description: Error updating matchExperience
  */
-router.put("/:id", recommendationController.updateRecommendation);
+router.put("/:id", matchExperienceController.updateMatchExperience);
 
 /**
  * @swagger
- * /recommendations/{id}:
+ * /matchExperiences/{id}:
  *   delete:
- *     summary: Delete a recommendation by ID
- *     tags: [Recommendations]
+ *     summary: Delete a matchExperience by ID
+ *     tags: [MatchExperiences]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: The recommendation ID
+ *         description: The matchExperience ID
  *     responses:
  *       200:
- *         description: The deleted recommendation
+ *         description: The deleted matchExperience
  *       404:
- *         description: Recommendation not found
+ *         description: MatchExperience not found
  *       500:
- *         description: Error deleting recommendation
+ *         description: Error deleting matchExperience
  */
-router.delete("/:id", recommendationController.deleteRecommendation);
+router.delete("/:id", matchExperienceController.deleteMatchExperience);
 
 /**
  * @swagger
- * /recommendations/{id}/comments:
+ * /matchExperiences/{id}/comments:
  *   post:
- *     summary: Add a comment to a recommendation
- *     tags: [Recommendations]
+ *     summary: Add a comment to a matchExperience
+ *     tags: [MatchExperiences]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: The recommendation ID
+ *         description: The matchExperience ID
  *     requestBody:
  *       required: true
  *       content:
@@ -301,27 +300,27 @@ router.delete("/:id", recommendationController.deleteRecommendation);
  *                 type: string
  *     responses:
  *       200:
- *         description: The updated recommendation with the new comment
+ *         description: The updated matchExperience with the new comment
  *       404:
- *         description: Recommendation not found
+ *         description: MatchExperience not found
  *       500:
  *         description: Error adding comment
  */
-router.post("/:id/comments", recommendationController.addComment);
+router.post("/:id/comments", matchExperienceController.addComment);
 
 /**
  * @swagger
- * /recommendations/{id}/like:
+ * /matchExperiences/{id}/like:
  *   post:
- *     summary: Like a recommendation
- *     tags: [Recommendations]
+ *     summary: Like a matchExperience
+ *     tags: [MatchExperiences]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: The recommendation ID
+ *         description: The matchExperience ID
  *     requestBody:
  *       required: true
  *       content:
@@ -335,27 +334,27 @@ router.post("/:id/comments", recommendationController.addComment);
  *                 type: string
  *     responses:
  *       200:
- *         description: The updated recommendation with a new like
+ *         description: The updated matchExperience with a new like
  *       404:
- *         description: Recommendation not found
+ *         description: MatchExperience not found
  *       500:
- *         description: Error liking recommendation
+ *         description: Error liking matchExperience
  */
-router.post("/:id/like", recommendationController.likeRecommendation);
+router.post("/:id/like", matchExperienceController.likeMatchExperience);
 
 /**
  * @swagger
- * /recommendations/{id}/unlike:
+ * /matchExperiences/{id}/unlike:
  *   post:
- *     summary: Unlike a recommendation
- *     tags: [Recommendations]
+ *     summary: Unlike a matchExperience
+ *     tags: [MatchExperiences]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: The recommendation ID
+ *         description: The matchExperience ID
  *     requestBody:
  *       required: true
  *       content:
@@ -369,12 +368,12 @@ router.post("/:id/like", recommendationController.likeRecommendation);
  *                 type: string
  *     responses:
  *       200:
- *         description: The updated recommendation with the like removed
+ *         description: The updated matchExperience with the like removed
  *       404:
- *         description: Recommendation not found
+ *         description: MatchExperience not found
  *       500:
- *         description: Error unliking recommendation
+ *         description: Error unliking matchExperience
  */
-router.post("/:id/unlike", recommendationController.unlikeRecommendation);
+router.post("/:id/unlike", matchExperienceController.unlikeMatchExperience);
 
 export default router;

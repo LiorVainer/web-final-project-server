@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ObjectIdToString } from "../utils/zod.utils";
 
 export const CommentSchema = z.object({
-  recommendationId: z.string(),
+  matchExperienceId: z.string(),
   userId: z.string(),
   content: z.string(),
   createdAt: z.date(),

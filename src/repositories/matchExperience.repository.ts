@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
-import { Recommendation } from "../models/recommendation.model";
+import { MatchExperience } from "../models/matchExperience.model";
 
-const RecommendationMongoSchema = new Schema(
+const MatchExperienceMongoSchema = new Schema(
   {
     homeTeam: { type: String, required: true },
     awayTeam: { type: String, required: true },
@@ -21,14 +21,14 @@ const RecommendationMongoSchema = new Schema(
   }
 );
 
-// Create and export the Recommendation model
-export const RecommendationRepository = mongoose.model<Recommendation>(
-  "Recommendations",
-  RecommendationMongoSchema
+// Create and export the MatchExperience model
+export const MatchExperienceRepository = mongoose.model<MatchExperience>(
+  "MatchExperiences",
+  MatchExperienceMongoSchema
 );
 
 // Optionally, you can also define a type for the document:
-export type RecommendationDocument = Document<unknown, {}, Recommendation> &
-  Recommendation & {
+export type MatchExperienceDocument = Document<unknown, {}, MatchExperience> &
+  MatchExperience & {
     __v: number;
   };

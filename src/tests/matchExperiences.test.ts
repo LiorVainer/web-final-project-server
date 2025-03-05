@@ -2,15 +2,15 @@ import request from "supertest";
 import { initApp } from "../server";
 import mongoose from "mongoose";
 import { Express } from "express";
-import { RecommendationRepository } from "../repositories/recommendation.repository";
+import { MatchExperienceRepository } from "../repositories/matchExperience.repository";
 import { UserRepository } from "../repositories/user.repository";
 
 let app: Express;
 let userAccessToken = "";
-let recommendationId = "";
+let matchExperienceId = "";
 let createdBy = "";
 
-const testRecommendation = {
+const testMatchExperience = {
   homeTeam: "Team A",
   awayTeam: "Team B",
   matchDate: new Date().toISOString(),
@@ -35,7 +35,7 @@ const testUser = {
 beforeAll(async () => {
   app = await initApp();
   await UserRepository.deleteMany();
-  await RecommendationRepository.deleteMany();
+  await MatchExperienceRepository.deleteMany();
 
   // Register and login user
   await request(app).post("/auth/register").send(testUser);
@@ -48,72 +48,71 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-describe("Recommendation API Integration Tests", () => {
-  test("creates a new recommendation", async () => {
+describe("MatchExperience API Integration Tests", () => {
+  test("creates a new matchExperience", async () => {
     const response = await request(app)
-      .post("/recommendations")
+      .post("/matchExperiences")
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({
-        ...testRecommendation,
+        ...testMatchExperience,
         createdBy,
       });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.title).toBe(testRecommendation.title);
-    recommendationId = response.body._id;
-    expect(recommendationId).toBeDefined();
+    expect(response.body.title).toBe(testMatchExperience.title);
+    matchExperienceId = response.body._id;
+    expect(matchExperienceId).toBeDefined();
   });
 
-  test("retrieves all recommendations", async () => {
-    const response = await request(app).get("/recommendations");
+  test("retrieves all matchExperiences", async () => {
+    const response = await request(app).get("/matchExperiences");
 
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBeGreaterThanOrEqual(1);
   });
 
-  test("retrieves a recommendation by ID", async () => {
+  test("retrieves a matchExperience by ID", async () => {
     const response = await request(app).get(
-      `/recommendations/${recommendationId}`
+      `/matchExperiences/${matchExperienceId}`
     );
 
     expect(response.statusCode).toBe(200);
-    expect(response.body._id).toBe(recommendationId);
+    expect(response.body._id).toBe(matchExperienceId);
   });
 
-  test("updates a recommendation", async () => {
+  test("updates a matchExperience", async () => {
     const response = await request(app)
-      .put(`/recommendations/${recommendationId}`)
+      .put(`/matchExperiences/${matchExperienceId}`)
       .set("Authorization", `JWT ${userAccessToken}`)
-      .send({ title: "Updated Recommendation Title" });
+      .send({ title: "Updated MatchExperience Title" });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.title).toBe("Updated Recommendation Title");
+    expect(response.body.title).toBe("Updated MatchExperience Title");
   });
 
-  test("adds a comment to a recommendation", async () => {
+  test("adds a comment to a matchExperience", async () => {
     const response = await request(app)
-      .post(`/recommendations/${recommendationId}/comments`)
+      .post(`/matchExperiences/${matchExperienceId}/comments`)
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({ userId: "testUserId", content: "Great match!" });
-
 
     expect(response.statusCode).toBe(200);
     expect(response.body.comments.length).toBeGreaterThanOrEqual(1);
   });
 
-  test("likes a recommendation", async () => {
+  test("likes a matchExperience", async () => {
     const response = await request(app)
-      .post(`/recommendations/${recommendationId}/like`)
+      .post(`/matchExperiences/${matchExperienceId}/like`)
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({ userId: "testUserId" });
-    
+
     expect(response.statusCode).toBe(200);
     expect(response.body.likes).toContain("testUserId");
   });
 
-  test("unlikes a recommendation", async () => {
+  test("unlikes a matchExperience", async () => {
     const response = await request(app)
-      .post(`/recommendations/${recommendationId}/unlike`)
+      .post(`/matchExperiences/${matchExperienceId}/unlike`)
       .set("Authorization", `JWT ${userAccessToken}`)
       .send({ userId: "testUserId" });
 
@@ -121,9 +120,9 @@ describe("Recommendation API Integration Tests", () => {
     expect(response.body.likes).not.toContain("testUserId");
   });
 
-  test("deletes a recommendation", async () => {
+  test("deletes a matchExperience", async () => {
     const response = await request(app)
-      .delete(`/recommendations/${recommendationId}`)
+      .delete(`/matchExperiences/${matchExperienceId}`)
       .set("Authorization", `JWT ${userAccessToken}`);
 
     expect(response.statusCode).toBe(200);
