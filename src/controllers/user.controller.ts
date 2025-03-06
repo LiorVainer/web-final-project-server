@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import bcryptjs from "bcryptjs";
-import { UserRepository } from "../repositories/user.repository";
-import { CreateUserBody, UpdateUserBody } from "../types/user.types";
+import { Request, Response } from 'express';
+import bcryptjs from 'bcryptjs';
+import { UserRepository } from '../repositories/user.repository';
+import { CreateUserBody, UpdateUserBody } from '../types/user.types';
 
 export const userController = {
   createUser: async (req: Request<{}, {}, CreateUserBody>, res: Response) => {

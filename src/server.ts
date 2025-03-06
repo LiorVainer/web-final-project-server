@@ -31,11 +31,11 @@ const options = {
   apis: ["./src/routes/*.ts"],
 };
 const specs = swaggerJsDoc(options);
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
 const db = mongoose.connection;
-db.on("error", (error) => console.error(error));
-db.once("open", () => console.log("Connected to database"));
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log('Connected to database'));
 
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
