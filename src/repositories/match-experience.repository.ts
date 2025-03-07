@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { MatchExperience } from '../models/match-experience.model';
+import { CommentSchema } from '../models/comment.model';
 
 const MatchExperienceMongoSchema = new Schema(
     {
@@ -20,13 +21,11 @@ const MatchExperienceMongoSchema = new Schema(
     }
 );
 
-// Create and export the MatchExperience model
 export const MatchExperienceRepository = mongoose.model<MatchExperience>(
     'MatchExperiences',
     MatchExperienceMongoSchema
 );
 
-// Optionally, you can also define a type for the document:
 export type MatchExperienceDocument = Document<unknown, {}, MatchExperience> &
     MatchExperience & {
         __v: number;
