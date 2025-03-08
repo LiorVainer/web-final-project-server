@@ -17,7 +17,7 @@ export const UserWithId = UserSchema.extend({
     _id: ObjectIdToString,
 });
 
-export const PublicUserSchema = UserSchema.omit({
+export const PublicUserSchema = UserWithId.omit({
     password: true,
     refreshTokens: true,
 });

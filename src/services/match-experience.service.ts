@@ -2,7 +2,7 @@ import { PopulatedMatchExperience } from '../models/match-experience.model';
 import { MatchExperienceRepository } from '../repositories/match-experience.repository';
 import mongoose from 'mongoose';
 
-class MatchService {
+class MatchExperienceService {
     getMatchExperienceById = async (id: string) => {
         try {
             const result = await MatchExperienceRepository.aggregate<PopulatedMatchExperience>([
@@ -68,4 +68,4 @@ class MatchService {
     };
 }
 
-export const matchService = new MatchService();
+export const matchExperienceService = new MatchExperienceService();

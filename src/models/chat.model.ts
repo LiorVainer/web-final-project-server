@@ -30,7 +30,7 @@ export const JoinRoomPayloadSchema = ChatSchema.pick({
 export const SendMessagePayloadSchema = z.object({
     matchExperienceId: ChatSchema.shape.matchExperienceId,
     senderId: ChatMessageSchema.shape.senderId,
-    receiverId: ChatSchema.shape.matchExperienceCreatorId, // Creator is usually the receiver
+    visitorId: ChatSchema.shape.visitorId,
     content: ChatMessageSchema.shape.content,
 });
 

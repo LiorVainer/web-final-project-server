@@ -3,7 +3,7 @@ import { MatchExperienceRepository } from '../repositories/match-experience.repo
 import { CommentRepository } from '../repositories/comment.repository';
 import mongoose from 'mongoose';
 import { CreateCommentDTO } from '../models/comment.model';
-import { matchService } from '../services/match-experience.service';
+import { matchExperienceService } from '../services/match-experience.service';
 
 // Controller object for matchExperience endpoints
 export const matchExperienceController = {
@@ -30,7 +30,7 @@ export const matchExperienceController = {
     getMatchExperienceById: async (req: Request, res: Response) => {
         try {
             const matchExpId = req.params.id;
-            const result = await matchService.getMatchExperienceById(matchExpId);
+            const result = await matchExperienceService.getMatchExperienceById(matchExpId);
 
             if (!result) {
                 return res.status(404).send('MatchExperience not found');
@@ -81,7 +81,7 @@ export const matchExperienceController = {
 
             const newComment: CreateCommentDTO = {
                 matchExperienceId: new mongoose.Types.ObjectId(matchExperienceId),
-                userId: new mongoose.Types.ObjectId('67c84091c494f0388a69261d'),
+                userId,
                 content,
             };
 
