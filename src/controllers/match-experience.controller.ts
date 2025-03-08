@@ -114,7 +114,6 @@ export const matchExperienceController = {
         }
     },
 
-    // Unlike a matchExperience (removes the userId from the likes array)
     unlikeMatchExperience: async (req: Request, res: Response) => {
         try {
             const matchExperienceId = req.params.id;
@@ -129,7 +128,7 @@ export const matchExperienceController = {
                 res.status(404).send('MatchExperience not found');
                 return;
             }
-            res.status(200).send(matchExperience);
+            res.status(200).send({ ok: true });
         } catch (err) {
             res.status(500).send(err);
         }
