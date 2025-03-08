@@ -3,7 +3,7 @@ import { MatchExperienceRepository } from '../repositories/match-experience.repo
 import { CommentRepository } from '../repositories/comment.repository';
 import mongoose from 'mongoose';
 import { CreateCommentDTO } from '../models/comment.model';
-import { matchService } from '../match-experience.service';
+import { matchService } from '../services/match-experience.service';
 
 // Controller object for matchExperience endpoints
 export const matchExperienceController = {

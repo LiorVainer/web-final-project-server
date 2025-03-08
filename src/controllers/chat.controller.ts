@@ -1,50 +1,35 @@
 import {Request, Response} from 'express';
-import {ChatRepository} from '../repositories/chat.repository';
+import mongoose from 'mongoose';
+import {chatService} from '../services/chat.service';
 
 /**
- * Fetches chat messages between a visitor and a match experience creator.
- * If no chat exists, a new empty chat document is created.
+ * Handles fetching either:
+ * - A specific chat between a visitor and creator (`getChatBetweenUsers`).
+ * - All chats for a match experience (`getChatsForMatchExperience`).
  */
 export const chatController = {
-    getChat: async (req: Request, res: Response) => {
+    getChats: async (req: Request, res: Response) => {
         try {
             const { matchExperienceId, visitorId, matchExperienceCreatorId } = req.query;
 
-            if (!matchExperienceId || !visitorId || !matchExperienceCreatorId) {
-                res.status(400).json({ error: 'Missing required query parameters' });
-                return;
+            if (!matchExperienceId || !mongoose.Types.ObjectId.isValid(matchExperienceId as string)) {
+                return res.status(400).json({ error: 'Invalid or missing matchExperienceId' });
             }
 
-            let chat = await ChatRepository.findOne({
-                matchExperienceId,
-                visitorId,
-                matchExperienceCreatorId,
-            })
-                .populate('matchExperienceCreatorId', 'username pictureId')
-                .populate('visitorId', 'username pictureId');
-
-            if (!chat) {
-                chat = new ChatRepository({
-                    matchExperienceId,
-                    visitorId,
-                    matchExperienceCreatorId,
-                    messages: [],
-                });
-                await chat.save();
+            if (visitorId && matchExperienceCreatorId) {
+                const chat = await chatService.getChatBetweenUsers(
+                    matchExperienceId as string,
+                    visitorId as string,
+                    matchExperienceCreatorId as string
+                );
+                return res.status(200).json(chat);
             }
 
-            const chatResponse = {
-                ...chat.toObject(),
-                visitor: chat.visitorId,
-                matchExperienceCreator: chat.matchExperienceCreatorId,
-                visitorId,
-                matchExperienceCreatorId,
-            };
-
-            res.status(200).json(chatResponse);
+            const chats = await chatService.getChatsForMatchExperience(matchExperienceId as string);
+            return res.status(200).json(chats);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error fetching chat' });
+            console.error('Error fetching chats:', error);
+            return res.status(500).json({ error: 'Error fetching chats' });
         }
     },
 };

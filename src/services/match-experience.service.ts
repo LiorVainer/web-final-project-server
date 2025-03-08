@@ -1,5 +1,5 @@
-import { PopulatedMatchExperience } from './models/match-experience.model';
-import { MatchExperienceRepository } from './repositories/match-experience.repository';
+import { PopulatedMatchExperience } from '../models/match-experience.model';
+import { MatchExperienceRepository } from '../repositories/match-experience.repository';
 import mongoose from 'mongoose';
 
 class MatchService {
