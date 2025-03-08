@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { MatchExperience } from '../models/match-experience.model';
-import { CommentSchema } from '../models/comment.model';
 
 const MatchExperienceMongoSchema = new Schema(
     {
