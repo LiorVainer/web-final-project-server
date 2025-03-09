@@ -25,6 +25,8 @@ export const JoinRoomPayloadSchema = ChatSchema.pick({
     matchExperienceId: true,
     matchExperienceCreatorId: true,
     visitorId: true,
+}).extend({
+    loggedInUserId: StringToObjectId,
 });
 
 export const SendMessagePayloadSchema = z.object({

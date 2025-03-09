@@ -7,11 +7,17 @@ import {
     SendMessagePayloadSchema,
 } from '../models/chat.model';
 import { matchExperienceService } from './match-experience.service';
-import { ROOM_PREFIX, SOCKET_EVENTS } from '../constants/socket.consts';
+import { ROOM_PREFIX, SOCKET_EVENTS } from '../constants/socket.const';
 import mongoose from 'mongoose';
 
 export class SocketService {
-    constructor(private io: Server) {}
+    private io: Server;
+    private activeUsers: Map<mongoose.Types.ObjectId, string>; // Maps userId to socketId
+
+    constructor(io: Server) {
+        this.io = io;
+        this.activeUsers = new Map();
+    }
 
     /**
      * Generates a unique room identifier for a match experience chat.
@@ -35,10 +41,19 @@ export class SocketService {
             return;
         }
 
-        const { matchExperienceId, visitorId, matchExperienceCreatorId } = parsed.data;
+        const { matchExperienceId, visitorId, matchExperienceCreatorId, loggedInUserId } = parsed.data;
         const privateRoom = this.getRoomName(matchExperienceId, matchExperienceCreatorId, visitorId);
+
         socket.join(privateRoom);
+        this.activeUsers.set(visitorId, socket.id);
+
         console.log(`User ${visitorId} joined room ${privateRoom}`);
+
+        // Notify the room that this user is online
+        this.io.to(privateRoom).emit(SOCKET_EVENTS.USER_CONNECTED, {
+            userId: loggedInUserId,
+            status: 'online',
+        });
     }
 
     /**
@@ -51,12 +66,12 @@ export class SocketService {
             return;
         }
 
-        const { matchExperienceId, senderId, content, visitorId } = parsed.data;
+        const { matchExperienceId, senderId, content } = parsed.data;
 
         try {
             let chat = await ChatRepository.findOne({
                 matchExperienceId,
-                visitorId,
+                $or: [{ visitorId: senderId }, { matchExperienceCreatorId: senderId }],
             });
 
             if (!chat) {
@@ -77,15 +92,36 @@ export class SocketService {
                 });
             }
 
+            // Create new message
             const newMessage = { senderId, content, createdAt: new Date() };
             chat.messages.push(newMessage);
             chat.updatedAt = new Date();
             await chat.save();
 
-            const privateRoomName = this.getRoomName(matchExperienceId, chat.matchExperienceCreatorId, chat.visitorId);
-            this.io.to(privateRoomName).emit(SOCKET_EVENTS.RECEIVE_MESSAGE, newMessage);
+            // Send message to the private chat room
+            const privateRoom = this.getRoomName(matchExperienceId, chat.matchExperienceCreatorId, chat.visitorId);
+            console.log(`Sending message to room ${privateRoom}`);
+            this.io.to(privateRoom).emit(SOCKET_EVENTS.RECEIVE_MESSAGE, newMessage);
         } catch (error) {
             console.error('Error storing message:', error);
+        }
+    }
+
+    /**
+     * Handles user disconnection.
+     */
+    private handleDisconnect(socket: Socket) {
+        const userId = [...this.activeUsers.entries()].find(([_, id]) => id === socket.id)?.[0];
+
+        if (userId) {
+            this.activeUsers.delete(userId);
+            console.log(`User ${userId} disconnected`);
+
+            // Notify all rooms that this user went offline
+            this.io.emit(SOCKET_EVENTS.USER_DISCONNECTED, {
+                userId,
+                status: 'offline',
+            });
         }
     }
 
@@ -98,10 +134,7 @@ export class SocketService {
 
             socket.on(SOCKET_EVENTS.JOIN_ROOM, (payload) => this.handleJoinRoom(socket, payload));
             socket.on(SOCKET_EVENTS.SEND_MESSAGE, (data) => this.handleSendMessage(socket, data));
-
-            socket.on(SOCKET_EVENTS.DISCONNECT, () => {
-                console.log(`User disconnected: ${socket.id}`);
-            });
+            socket.on(SOCKET_EVENTS.DISCONNECT, () => this.handleDisconnect(socket));
         });
     }
 }
