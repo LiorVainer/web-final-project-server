@@ -80,7 +80,7 @@ export const soccerController = {
     const response = await soccerApiClient.get("/teams", {
       params: {
         league,
-        season,
+        season : season || currSeason,
       },
     });
 
