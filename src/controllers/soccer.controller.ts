@@ -75,12 +75,12 @@ export const soccerController = {
   },
 
   getTeams: async (req: Request, res: Response) => {
-    const { league } = req.query;
+    const { league, season } = req.query;
 
     const response = await soccerApiClient.get("/teams", {
       params: {
         league,
-        season: currSeason,
+        season,
       },
     });
 
