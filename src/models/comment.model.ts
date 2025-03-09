@@ -1,23 +1,32 @@
-import { z } from "zod";
-import { ObjectIdToString } from "../utils/zod.utils";
+import { z } from 'zod';
+import { StringToObjectId } from '../utils/zod.utils';
+import { UserWithId } from './user.model';
 
 export const CommentSchema = z.object({
-  matchExperienceId: z.string(),
-  userId: z.string(),
-  content: z.string(),
-  createdAt: z.date(),
+    matchExperienceId: StringToObjectId,
+    userId: StringToObjectId,
+    content: z.string(),
+    createdAt: z.date(),
+    updatedAt: z.date(),
 });
+
+export const PopulatedCommentSchema = CommentSchema.extend({
+    user: UserWithId,
+});
+
+export type PopulatedComment = z.infer<typeof PopulatedCommentSchema>;
 
 export type Comment = z.infer<typeof CommentSchema>;
 
 export const CommentWithId = CommentSchema.extend({
-  _id: ObjectIdToString,
+    _id: StringToObjectId,
 });
 
 export type CommentWithId = z.infer<typeof CommentWithId>;
 
-export const CommentWithoutTimestampsSchema = CommentSchema.omit({
-  createdAt: true,
+export const CreateCommentDTOSchema = CommentSchema.omit({
+    createdAt: true,
+    updatedAt: true,
 });
 
-export type CommentPayload = z.infer<typeof CommentWithoutTimestampsSchema>;
+export type CreateCommentDTO = z.infer<typeof CreateCommentDTOSchema>;

@@ -1,25 +1,22 @@
-import mongoose, { Document, Schema } from "mongoose";
-import { Comment } from "../models/comment.model";
+import mongoose, { Document, Schema } from 'mongoose';
+import { Comment } from '../models/comment.model';
 
 const CommentMongoSchema = new Schema(
-  {
-    matchExperienceId: { type: String, required: true },
-    userId: { type: String, required: true },
-    content: { type: String, required: true },
-  },
-  {
-    timestamps: { createdAt: true, updatedAt: false },
-  }
+    {
+        matchExperienceId: { type: Schema.Types.ObjectId, ref: 'MatchExperiences', required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
+        content: { type: String, required: true },
+    },
+    {
+        timestamps: { createdAt: true, updatedAt: true },
+    }
 );
 
-export const CommentRepository = mongoose.model<Comment>(
-  "Comments",
-  CommentMongoSchema
-);
+export const CommentRepository = mongoose.model<Comment>('Comments', CommentMongoSchema);
 export type CommentDocument = Document<unknown, {}, Comment> &
-  Comment &
-  Required<{
-    _id: string;
-  }> & {
-    __v: number;
-  };
+    Comment &
+    Required<{
+        _id: string;
+    }> & {
+        __v: number;
+    };
