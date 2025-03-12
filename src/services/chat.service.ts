@@ -1,10 +1,6 @@
 import { ChatRepository } from '../repositories/chat.repository';
 
 class ChatService {
-    /**
-     * Fetch a specific chat between a visitor and a match experience creator.
-     * If no chat exists, it creates a new one.
-     */
     async getChatBetweenUsers(matchExperienceId: string, visitorId: string, matchExperienceCreatorId: string) {
         try {
             let chat = await ChatRepository.findOne({

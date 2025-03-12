@@ -47,9 +47,6 @@ export class SocketService {
         socket.join(privateRoom);
         this.activeUsers.set(visitorId, socket.id);
 
-        console.log(`User ${visitorId} joined room ${privateRoom}`);
-
-        // Notify the room that this user is online
         this.io.to(privateRoom).emit(SOCKET_EVENTS.USER_CONNECTED, {
             userId: loggedInUserId,
             status: 'online',
@@ -62,8 +59,7 @@ export class SocketService {
     private async handleSendMessage(socket: Socket, data: SendMessagePayload) {
         const parsed = SendMessagePayloadSchema.safeParse(data);
         if (!parsed.success) {
-            console.error('Invalid sendMessage payload:', parsed.error.format());
-            return;
+            throw new Error(`Invalid sendMessage payload: ${parsed.error.format()}`);
         }
 
         const { matchExperienceId, senderId, content } = parsed.data;
@@ -80,8 +76,7 @@ export class SocketService {
                 );
 
                 if (senderId.toString() === matchExperience?.createdBy._id.toString()) {
-                    console.error('Creator cannot be the one to send the first message');
-                    return;
+                    throw new Error('Creator cannot be the one to send the first message');
                 }
 
                 chat = new ChatRepository({
@@ -92,18 +87,15 @@ export class SocketService {
                 });
             }
 
-            // Create new message
             const newMessage = { senderId, content, createdAt: new Date() };
             chat.messages.push(newMessage);
             chat.updatedAt = new Date();
             await chat.save();
 
-            // Send message to the private chat room
             const privateRoom = this.getRoomName(matchExperienceId, chat.matchExperienceCreatorId, chat.visitorId);
-            console.log(`Sending message to room ${privateRoom}`);
             this.io.to(privateRoom).emit(SOCKET_EVENTS.RECEIVE_MESSAGE, newMessage);
         } catch (error) {
-            console.error('Error storing message:', error);
+            throw new Error(`Error sending message: ${error}`);
         }
     }
 
@@ -115,9 +107,7 @@ export class SocketService {
 
         if (userId) {
             this.activeUsers.delete(userId);
-            console.log(`User ${userId} disconnected`);
 
-            // Notify all rooms that this user went offline
             this.io.emit(SOCKET_EVENTS.USER_DISCONNECTED, {
                 userId,
                 status: 'offline',

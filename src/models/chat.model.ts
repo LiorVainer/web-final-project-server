@@ -7,10 +7,6 @@ export const ChatMessageSchema = z.object({
     createdAt: zodDate,
 });
 
-export const CreateChatMessagePayloadSchema = ChatMessageSchema.omit({
-    createdAt: true,
-});
-
 export const ChatSchema = z.object({
     _id: z.string(),
     matchExperienceId: StringToObjectId,
@@ -19,6 +15,12 @@ export const ChatSchema = z.object({
     messages: z.array(ChatMessageSchema),
     createdAt: zodDate,
     updatedAt: zodDate,
+});
+
+export const GetChatQueryParamsSchema = z.object({
+    matchExperienceId: z.string(),
+    matchExperienceCreatorId: z.string().optional(),
+    visitorId: z.string().optional(),
 });
 
 export const JoinRoomPayloadSchema = ChatSchema.pick({
@@ -36,8 +38,8 @@ export const SendMessagePayloadSchema = z.object({
     content: ChatMessageSchema.shape.content,
 });
 
-export type CreateChatMessagePayload = z.infer<typeof CreateChatMessagePayloadSchema>;
 export type JoinRoomPayload = z.infer<typeof JoinRoomPayloadSchema>;
 export type SendMessagePayload = z.infer<typeof SendMessagePayloadSchema>;
 export type Chat = z.infer<typeof ChatSchema>;
 export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+export type GetChatQueryParams = z.infer<typeof GetChatQueryParamsSchema>;

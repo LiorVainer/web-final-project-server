@@ -12,7 +12,7 @@ const ChatMongoSchema = new Schema<Chat>(
         matchExperienceId: { type: Schema.Types.ObjectId, ref: 'MatchExperiences', required: true },
         matchExperienceCreatorId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
         visitorId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
-        messages: [ChatMessageSchema], // Embedded messages array
+        messages: [ChatMessageSchema],
     },
     { timestamps: true }
 );

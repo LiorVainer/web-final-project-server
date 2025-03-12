@@ -5,9 +5,7 @@ import mongoose from 'mongoose';
 import { CreateCommentDTO } from '../models/comment.model';
 import { matchExperienceService } from '../services/match-experience.service';
 
-// Controller object for matchExperience endpoints
 export const matchExperienceController = {
-    // Create a new matchExperience
     createMatchExperience: async (req: Request, res: Response) => {
         try {
             const matchExperience = await MatchExperienceRepository.create(req.body);
@@ -17,7 +15,6 @@ export const matchExperienceController = {
         }
     },
 
-    // Get all matchExperiences
     getAll: async (req: Request, res: Response) => {
         try {
             const matchExperiences = await MatchExperienceRepository.find();
@@ -101,7 +98,7 @@ export const matchExperienceController = {
 
             const matchExperience = await MatchExperienceRepository.findByIdAndUpdate(
                 matchExperienceId,
-                { $addToSet: { likes: userId } }, // prevents duplicates
+                { $addToSet: { likes: userId } },
                 { new: true }
             );
             if (!matchExperience) {
