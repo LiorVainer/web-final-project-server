@@ -13,7 +13,7 @@ export const userController = {
                 email,
                 password: hashedPassword,
                 username: req.body.username,
-                pictureId: req.body.pictureId,
+                picture: req.body.picture,
             });
             res.status(201).send(newUser);
         } catch (err) {

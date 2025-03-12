@@ -8,8 +8,8 @@ class ChatService {
                 visitorId,
                 matchExperienceCreatorId,
             })
-                .populate('matchExperienceCreatorId', 'username pictureId')
-                .populate('visitorId', 'username pictureId');
+                .populate('matchExperienceCreatorId', 'username picture')
+                .populate('visitorId', 'username picture');
 
             if (!chat) {
                 chat = new ChatRepository({
@@ -41,8 +41,8 @@ class ChatService {
     async getChatsForMatchExperience(matchExperienceId: string) {
         try {
             const chats = await ChatRepository.find({ matchExperienceId })
-                .populate('matchExperienceCreatorId', 'username pictureId')
-                .populate('visitorId', 'username pictureId')
+                .populate('matchExperienceCreatorId', 'username picture')
+                .populate('visitorId', 'username picture')
                 .sort({ updatedAt: -1 });
 
             return chats.map((chat) => ({
