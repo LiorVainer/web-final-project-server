@@ -14,7 +14,7 @@ export const register: RequestHandler<Record<any, any>, User | unknown, UserPayl
             email: req.body.email,
             password: hashedPassword,
             username: req.body.username,
-            pictureId: req.body.pictureId,
+            picture: req.body.picture,
         });
 
         res.status(200).send(user);
