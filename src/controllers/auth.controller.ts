@@ -3,56 +3,51 @@ import bcryptjs from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { UserDocument, UserRepository } from '../repositories/user.repository';
 import { RefreshResponse, RefreshTokenBody, Tokens } from '../types/auth.types';
-import { User, UserPayload } from '../models/user.model';
+import { PublicUser, User, UserPayload } from '../models/user.model';
 
 export const register: RequestHandler<Record<any, any>, User | unknown, UserPayload> = async (req, res) => {
     try {
         const password = req.body.password;
         const salt = await bcryptjs.genSalt(10);
         const hashedPassword = await bcryptjs.hash(password, salt);
-        const user = await UserRepository.create({
+        const userPayload = {
             email: req.body.email,
             password: hashedPassword,
             username: req.body.username,
             picture: req.body.picture,
-        }); 	
+        };
+        const user = (await UserRepository.create(userPayload)).toObject();
+        const { password: _password, refreshTokens, ...publicUser } = user;
 
-        res.status(200).send(user);
+        const userResponsePayload: PublicUser = {
+            ...publicUser,
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(userResponsePayload);
+
+        res.status(200).send({ ...userResponsePayload, ...tokens });
     } catch (err) {
         res.status(500).send(err);
     }
 };
 
-export const generateTokens = (userId: string): Tokens | null => {
+export const generateTokens = (user: PublicUser): Tokens | null => {
     if (!process.env.TOKEN_SECRET) {
         return null;
     }
 
-    // generate token
-    const random = Math.random().toString();
-    const accessToken = jwt.sign(
-        {
-            _id: userId,
-            random,
-        },
-        process.env.TOKEN_SECRET,
-        { expiresIn: process.env.TOKEN_EXPIRES as SignOptions['expiresIn'] }
-    );
+    const accessToken = jwt.sign(user, process.env.TOKEN_SECRET, {
+        expiresIn: process.env.TOKEN_EXPIRES as SignOptions['expiresIn'],
+    });
 
-    const refreshToken = jwt.sign(
-        {
-            _id: userId,
-            random,
-        },
-        process.env.TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'],
-        }
-    );
+    const refreshToken = jwt.sign(user, process.env.TOKEN_SECRET, {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'],
+    });
 
     return {
-        accessToken: accessToken,
-        refreshToken: refreshToken,
+        accessToken,
+        refreshToken,
     };
 };
 
@@ -60,12 +55,12 @@ export const login = async (req: Request, res: Response) => {
     try {
         const user = await UserRepository.findOne({ email: req.body.email });
         if (!user) {
-            res.status(400).send('wrong email or password');
+            res.status(400).send('wrong username or password');
             return;
         }
         const validPassword = await bcryptjs.compare(req.body.password, user.password);
         if (!validPassword) {
-            res.status(400).send('wrong email or password');
+            res.status(400).send('wrong username or password');
             return;
         }
         if (!process.env.TOKEN_SECRET) {
@@ -76,8 +71,14 @@ export const login = async (req: Request, res: Response) => {
             user.refreshTokens = [];
         }
 
-        // generate token
-        const tokens = generateTokens(user._id.toString());
+        const { password, refreshTokens, ...publicUser } = user.toObject();
+
+        const userResponsePayload: PublicUser = {
+            ...publicUser,
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(userResponsePayload);
 
         if (!tokens) {
             res.status(500).send('Server Error');
@@ -88,9 +89,8 @@ export const login = async (req: Request, res: Response) => {
         await user.save();
 
         res.status(200).send({
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-            _id: user._id,
+            ...tokens,
+            ...userResponsePayload,
         });
     } catch (err) {
         res.status(500).send(err);
@@ -155,7 +155,12 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
             return;
         }
 
-        const tokens = generateTokens(user._id);
+        const userResponsePayload: PublicUser = {
+            ...user.toObject(),
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(userResponsePayload);
 
         if (!tokens) {
             res.status(500).send('Server Error');
