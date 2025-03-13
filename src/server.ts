@@ -11,6 +11,7 @@ import cors from 'cors';
 import { handleErrorMiddleware } from './middlewares/error.middleware';
 import fileRoutes from './routes/file.route';
 import chatRoutes from './routes/chat.route';
+import aiRoutes from './routes/ai.route';
 import soccerRoutes from './routes/soccer.route';
 import { createServer } from 'http'; // Import HTTP server
 import { Server as SocketIOServer } from 'socket.io';
@@ -52,6 +53,7 @@ app.use('/users', usersRoutes);
 app.use('/chat', chatRoutes);
 app.use('/match-experiences', matchExperienceRoutes);
 app.use('/soccer', soccerRoutes);
+app.use('/ai', aiRoutes);
 app.use('/file', fileRoutes);
 app.use('/public', express.static('public'));
 
