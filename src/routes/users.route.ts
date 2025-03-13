@@ -1,6 +1,6 @@
-import express from "express";
-import { userController } from "../controllers/user.controller";
-import { authMiddleware } from "../controllers/auth.controller";
+import express from 'express';
+import { userController } from '../controllers/user.controller';
+import { authMiddleware } from '../middlewares/auth.middlware';
 
 const router = express.Router();
 
@@ -118,7 +118,7 @@ const router = express.Router();
  *       500:
  *         description: Error fetching users
  */
-router.get("/", userController.getAllUsers);
+router.get('/', userController.getAllUsers);
 
 /**
  * @swagger
@@ -145,7 +145,7 @@ router.get("/", userController.getAllUsers);
  *       500:
  *         description: Error fetching user
  */
-router.get("/:id", userController.getUserById);
+router.get('/:id', userController.getUserById);
 
 /**
  * @swagger
@@ -169,7 +169,7 @@ router.get("/:id", userController.getUserById);
  *       500:
  *         description: Error creating user
  */
-router.post("/", userController.createUser);
+router.post('/', userController.createUser);
 
 /**
  * @swagger
@@ -206,7 +206,7 @@ router.post("/", userController.createUser);
  *       500:
  *         description: Error updating user
  */
-router.put("/:id", authMiddleware, userController.updateUserById);
+router.put('/:id', authMiddleware, userController.updateUserById);
 
 /**
  * @swagger
@@ -237,6 +237,6 @@ router.put("/:id", authMiddleware, userController.updateUserById);
  *       500:
  *         description: Error deleting user
  */
-router.delete("/:id", authMiddleware, userController.deleteUserById);
+router.delete('/:id', authMiddleware, userController.deleteUserById);
 
 export default router;

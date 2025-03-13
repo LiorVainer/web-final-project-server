@@ -1,4 +1,4 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import bcryptjs from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { UserDocument, UserRepository } from '../repositories/user.repository';
@@ -108,7 +108,7 @@ const verifyRefreshToken = async (refreshToken: string | undefined) => {
     let user: UserDocument | null = null;
 
     try {
-        const payload = jwt.verify(refreshToken, process.env.TOKEN_SECRET) as Payload;
+        const payload = jwt.verify(refreshToken, process.env.TOKEN_SECRET) as PublicUser;
         user = await UserRepository.findById(payload._id);
 
         if (!user) {
@@ -184,29 +184,34 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
     }
 };
 
-type Payload = {
-    _id: string;
-};
-
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const authorization = req.header('authorization');
-
-    const token = authorization && authorization.split(' ')[1];
-
-    if (!token) {
-        res.status(401).send('Unauthorized');
-        return;
-    }
-    if (!process.env.TOKEN_SECRET) {
-        res.status(500).send('Server Error');
-        return;
-    }
-
+export const me = async (req: Request, res: Response) => {
     try {
-        const payload = jwt.verify(token, process.env.TOKEN_SECRET) as Payload;
-        req.params.userId = payload._id;
-        next();
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            res.status(401).send('Token not found');
+            return;
+        }
+        if (!process.env.TOKEN_SECRET) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        let payload: PublicUser | null = null;
+        try {
+            payload = jwt.verify(token, process.env.TOKEN_SECRET) as PublicUser;
+        } catch (e) {
+            res.status(401).send('Invalid token');
+            return;
+        }
+
+        const user = await UserRepository.findById(payload?._id);
+        if (!user) {
+            res.status(400).send('User not found');
+            return;
+        }
+        res.status(200).send(user);
     } catch (err) {
-        res.status(401).send('Unauthorized');
+        console.log(err);
+        res.status(500).send(err);
     }
 };
