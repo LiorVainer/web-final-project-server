@@ -13,7 +13,7 @@ const testUser: UserWithTokens = {
   email: "test@user.com",
   password: "testpassword",
   username: "testuser",
-  pictureId: "testpicture",
+  picture: "testpicture",
 };
 
 beforeAll(async () => {

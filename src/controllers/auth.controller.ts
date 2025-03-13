@@ -14,8 +14,8 @@ export const register: RequestHandler<Record<any, any>, User | unknown, UserPayl
             email: req.body.email,
             password: hashedPassword,
             username: req.body.username,
-            pictureId: req.body.pictureId,
-        });
+            picture: req.body.picture,
+        }); 	
 
         res.status(200).send(user);
     } catch (err) {
@@ -60,12 +60,12 @@ export const login = async (req: Request, res: Response) => {
     try {
         const user = await UserRepository.findOne({ email: req.body.email });
         if (!user) {
-            res.status(400).send('wrong username or password');
+            res.status(400).send('wrong email or password');
             return;
         }
         const validPassword = await bcryptjs.compare(req.body.password, user.password);
         if (!validPassword) {
-            res.status(400).send('wrong username or password');
+            res.status(400).send('wrong email or password');
             return;
         }
         if (!process.env.TOKEN_SECRET) {

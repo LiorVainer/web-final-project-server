@@ -9,7 +9,7 @@ const UserMongoSchema = new Schema(
     username: { type: String, required: true },
     password: { type: String, required: true },
     email: { type: String, required: true },
-    pictureId: { type: String, required: true },
+    picture: { type: String, required: true },
     refreshTokens: { type: [String], default: [] },
   },
   {

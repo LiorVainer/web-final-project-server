@@ -58,7 +58,7 @@ const router = express.Router();
  *         - email
  *         - password
  *         - username
- *         - pictureId
+ *         - picture
  *       properties:
  *         email:
  *           type: string
@@ -69,14 +69,14 @@ const router = express.Router();
  *         username:
  *           type: string
  *           description: The user's username
- *         pictureId:
+ *         picture:
  *           type: string
- *           description: The user's picture ID
+ *           description: The user's picture
  *       example:
  *         email: "newuser@gmail.com"
  *         password: "securepassword123"
  *         username: "newuser"
- *         pictureId: "newpicture"
+ *         picture: "newpicture"
  *
  *     UpdateUserBody:
  *       type: object
@@ -90,14 +90,14 @@ const router = express.Router();
  *         username:
  *           type: string
  *           description: The updated username
- *         pictureId:
+ *         picture:
  *           type: string
- *           description: The updated picture ID
+ *           description: The updated picture
  *       example:
  *         email: "updateduser@gmail.com"
  *         password: "newsecurepassword123"
  *         username: "updateduser"
- *         pictureId: "updatedpicture"
+ *         picture: "updatedpicture"
  */
 
 /**
