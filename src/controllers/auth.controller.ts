@@ -16,8 +16,8 @@ export const register: RequestHandler<Record<any, any>, User | unknown, UserPayl
             username: req.body.username,
             picture: req.body.picture,
         };
-        const user = (await UserRepository.create(userPayload)).toObject();
-        const { password: _password, refreshTokens, ...publicUser } = user;
+        const user = await UserRepository.create(userPayload);
+        const { password: _password, refreshTokens, ...publicUser } = user.toObject();
 
         const userResponsePayload: PublicUser = {
             ...publicUser,
@@ -25,6 +25,14 @@ export const register: RequestHandler<Record<any, any>, User | unknown, UserPayl
         };
 
         const tokens = generateTokens(userResponsePayload);
+
+        if (!tokens) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        user.refreshTokens?.push(tokens.refreshToken);
+        await user.save();
 
         res.status(200).send({ ...userResponsePayload, ...tokens });
     } catch (err) {
@@ -196,20 +204,15 @@ export const me = async (req: Request, res: Response) => {
             return;
         }
 
-        let payload: PublicUser | null = null;
+        let publicUser: PublicUser | null = null;
         try {
-            payload = jwt.verify(token, process.env.TOKEN_SECRET) as PublicUser;
+            publicUser = jwt.verify(token, process.env.TOKEN_SECRET) as PublicUser;
         } catch (e) {
             res.status(401).send('Invalid token');
             return;
         }
 
-        const user = await UserRepository.findById(payload?._id);
-        if (!user) {
-            res.status(400).send('User not found');
-            return;
-        }
-        res.status(200).send(user);
+        res.status(200).send(publicUser);
     } catch (err) {
         console.log(err);
         res.status(500).send(err);
