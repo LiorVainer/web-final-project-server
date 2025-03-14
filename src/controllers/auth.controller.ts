@@ -4,6 +4,9 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { UserDocument, UserRepository } from '../repositories/user.repository';
 import { RefreshResponse, RefreshTokenBody, Tokens } from '../types/auth.types';
 import { PublicUser, User, UserPayload } from '../models/user.model';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register: RequestHandler<Record<any, any>, User | unknown, UserPayload> = async (req, res) => {
     try {
@@ -189,6 +192,68 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
         });
     } catch (err) {
         res.status(500).send('Server Error');
+    }
+};
+
+export const googleLogin = async (req: Request, res: Response) => {
+    try {
+        const { credential } = req.body;
+        console.log('credential', credential);
+
+        if (!credential) {
+            res.status(400).send('Invalid Google token');
+            return;
+        }
+
+        console.log('Google Client ID:', process.env.GOOGLE_CLIENT_ID);
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        if (!payload || !payload.email) {
+            return;
+        }
+
+        let user = await UserRepository.findOne({ email: payload.email });
+
+        if (!user) {
+            user = await UserRepository.create({
+                email: payload.email,
+                username: payload.name || '',
+                picture: payload.picture || '',
+                password: 'google-signin', // Placeholder password for security
+            });
+        }
+
+        const userResponsePayload: PublicUser = {
+            ...user.toObject(),
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(userResponsePayload);
+
+        if (!tokens) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        if (!user.refreshTokens) {
+            user.refreshTokens = [];
+        }
+
+        user.refreshTokens.push(tokens.refreshToken);
+        await user.save();
+
+        res.status(200).send({
+            ...tokens,
+            ...userResponsePayload,
+        });
+    } catch (err) {
+        console.error('Google login error:', err);
+        res.status(500).send('Internal Server Error');
     }
 };
 
