@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.get('/me', authController.me);
 
+router.post('/google', authController.googleLogin);
+
 /**
  * @swagger
  * tags:

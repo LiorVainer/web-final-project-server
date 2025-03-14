@@ -4,6 +4,9 @@ import jwt, { SignOptions } from 'jsonwebtoken';
 import { UserDocument, UserRepository } from '../repositories/user.repository';
 import { RefreshResponse, RefreshTokenBody, Tokens } from '../types/auth.types';
 import { PublicUser, User, UserPayload } from '../models/user.model';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register: RequestHandler<Record<any, any>, User | unknown, UserPayload> = async (req, res) => {
     try {
@@ -63,12 +66,12 @@ export const login = async (req: Request, res: Response) => {
     try {
         const user = await UserRepository.findOne({ email: req.body.email });
         if (!user) {
-            res.status(400).send('wrong username or password');
+            res.status(401).send('wrong username or password');
             return;
         }
         const validPassword = await bcryptjs.compare(req.body.password, user.password);
         if (!validPassword) {
-            res.status(400).send('wrong username or password');
+            res.status(401).send('wrong username or password');
             return;
         }
         if (!process.env.TOKEN_SECRET) {
@@ -163,12 +166,14 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
             return;
         }
 
-        const userResponsePayload: PublicUser = {
-            ...user.toObject(),
+        const { refreshTokens, ...userPayload } = user.toObject();
+
+        const publicUser: PublicUser = {
+            ...userPayload,
             _id: user._id.toString(),
         };
 
-        const tokens = generateTokens(userResponsePayload);
+        const tokens = generateTokens(publicUser);
 
         if (!tokens) {
             res.status(500).send('Server Error');
@@ -189,6 +194,66 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
         });
     } catch (err) {
         res.status(500).send('Server Error');
+    }
+};
+
+export const googleLogin = async (req: Request, res: Response) => {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            res.status(400).send('Invalid Google token');
+            return;
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        if (!payload || !payload.email) {
+            return;
+        }
+
+        let user = await UserRepository.findOne({ email: payload.email });
+
+        if (!user) {
+            user = await UserRepository.create({
+                email: payload.email,
+                username: payload.name || '',
+                picture: payload.picture || '',
+                password: 'google-signin',
+            });
+        }
+
+        const { refreshTokens, ...userPayload } = user.toObject();
+
+        const publicUser: PublicUser = {
+            ...userPayload,
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(publicUser);
+
+        if (!tokens) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        if (!user.refreshTokens) {
+            user.refreshTokens = [];
+        }
+
+        user.refreshTokens.push(tokens.refreshToken);
+        await user.save();
+
+        res.status(200).send({
+            ...tokens,
+            ...publicUser,
+        });
+    } catch (err) {
+        res.status(500).send('Internal Server Error');
     }
 };
 
