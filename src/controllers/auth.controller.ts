@@ -223,7 +223,7 @@ export const googleLogin = async (req: Request, res: Response) => {
                 email: payload.email,
                 username: payload.name || '',
                 picture: payload.picture || '',
-                password: 'google-signin', // Placeholder password for security
+                password: 'google-signin',
             });
         }
 
