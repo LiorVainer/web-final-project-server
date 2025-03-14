@@ -18,7 +18,6 @@ export const fileController = {
             return;
         }
         const filePath = path.join(__dirname, '../../public', url);
-        console.log(filePath);
 
         fs.unlink(filePath, (err) => {
             if (err) {
