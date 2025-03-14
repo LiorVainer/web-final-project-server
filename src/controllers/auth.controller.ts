@@ -66,12 +66,12 @@ export const login = async (req: Request, res: Response) => {
     try {
         const user = await UserRepository.findOne({ email: req.body.email });
         if (!user) {
-            res.status(400).send('wrong username or password');
+            res.status(401).send('wrong username or password');
             return;
         }
         const validPassword = await bcryptjs.compare(req.body.password, user.password);
         if (!validPassword) {
-            res.status(400).send('wrong username or password');
+            res.status(401).send('wrong username or password');
             return;
         }
         if (!process.env.TOKEN_SECRET) {
@@ -166,12 +166,14 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
             return;
         }
 
-        const userResponsePayload: PublicUser = {
-            ...user.toObject(),
+        const { refreshTokens, ...userPayload } = user.toObject();
+
+        const publicUser: PublicUser = {
+            ...userPayload,
             _id: user._id.toString(),
         };
 
-        const tokens = generateTokens(userResponsePayload);
+        const tokens = generateTokens(publicUser);
 
         if (!tokens) {
             res.status(500).send('Server Error');
@@ -198,14 +200,11 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
 export const googleLogin = async (req: Request, res: Response) => {
     try {
         const { credential } = req.body;
-        console.log('credential', credential);
 
         if (!credential) {
             res.status(400).send('Invalid Google token');
             return;
         }
-
-        console.log('Google Client ID:', process.env.GOOGLE_CLIENT_ID);
 
         const ticket = await googleClient.verifyIdToken({
             idToken: credential,
@@ -228,12 +227,14 @@ export const googleLogin = async (req: Request, res: Response) => {
             });
         }
 
-        const userResponsePayload: PublicUser = {
-            ...user.toObject(),
+        const { refreshTokens, ...userPayload } = user.toObject();
+
+        const publicUser: PublicUser = {
+            ...userPayload,
             _id: user._id.toString(),
         };
 
-        const tokens = generateTokens(userResponsePayload);
+        const tokens = generateTokens(publicUser);
 
         if (!tokens) {
             res.status(500).send('Server Error');
@@ -249,10 +250,9 @@ export const googleLogin = async (req: Request, res: Response) => {
 
         res.status(200).send({
             ...tokens,
-            ...userResponsePayload,
+            ...publicUser,
         });
     } catch (err) {
-        console.error('Google login error:', err);
         res.status(500).send('Internal Server Error');
     }
 };
