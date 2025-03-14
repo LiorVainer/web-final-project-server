@@ -5,7 +5,11 @@ import { Country, League, Team, Venue } from "../types/soccer.types";
 
 dotenv.config();
 
-export const currSeason = process.env.SEASON || new Date().getFullYear() - 1;
+const calculateCurrentSeason = (date: Date): number => {
+  return date.getMonth() >= 6 ? date.getFullYear() : date.getFullYear() - 1;
+};
+
+export const currSeason = calculateCurrentSeason(new Date());
 
 export const soccerApiClient = axios.create({
   baseURL: "https://v3.football.api-sports.io",
@@ -13,12 +17,6 @@ export const soccerApiClient = axios.create({
     "x-apisports-key": process.env.API_KEY || "",
   },
 });
-
-type LeaguesResponse = {
-  data: {
-     response: { league: League; country: Country }[]
-  }
-}
 
 export const soccerController = {
   getCountries: async (_req: Request, res: Response) => {
@@ -75,12 +73,12 @@ export const soccerController = {
   },
 
   getTeams: async (req: Request, res: Response) => {
-    const { league } = req.query;
+    const { league, season } = req.query;
 
     const response = await soccerApiClient.get("/teams", {
       params: {
         league,
-        season: currSeason,
+        season : season || currSeason,
       },
     });
 

@@ -21,63 +21,60 @@ export const userController = {
     }
   },
 
-  getAllUsers: async (_req: Request, res: Response) => {
-    try {
-      const users = await UserRepository.find({});
-      res.status(200).send(users);
-    } catch (err) {
-      res.status(500).send({ message: "Error fetching users", error: err });
-    }
-  },
+    getAllUsers: async (_req: Request, res: Response) => {
+        try {
+            const users = await UserRepository.find({});
+            res.status(200).send(users);
+        } catch (err) {
+            res.status(500).send({ message: 'Error fetching users', error: err });
+        }
+    },
 
-  getUserById: async (req: Request, res: Response) => {
-    try {
-      const userId = req.params.id;
-      const user = await UserRepository.findById(userId);
-      if (!user) {
-        res.status(404).send({ message: "User not found" });
-        return;
-      }
-      res.status(200).send(user);
-    } catch (err) {
-      res.status(500).send({ message: "Error fetching user", error: err });
-    }
-  },
+    getUserById: async (req: Request, res: Response) => {
+        try {
+            const userId = req.params.id;
+            const user = await UserRepository.findById(userId);
+            if (!user) {
+                res.status(404).send({ message: 'User not found' });
+                return;
+            }
+            res.status(200).send(user);
+        } catch (err) {
+            res.status(500).send({ message: 'Error fetching user', error: err });
+        }
+    },
 
-  updateUserById: async (
-    req: Request<Record<any, any>, {}, UpdateUserBody>,
-    res: Response
-  ) => {
-    try {
-      const userId = req.params.id;
-      const { email, password } = req.body;
-      const user = await UserRepository.findById(userId);
-      if (!user) {
-        res.status(404).send({ message: "User not found" });
-        return;
-      }
-      if (email) user.email = email;
-      if (password) {
-        const salt = await bcryptjs.genSalt(10);
-        user.password = await bcryptjs.hash(password, salt);
-      }
-      await user.save();
-      res.status(200).send(user);
-    } catch (err) {
-      res.status(500).send({ message: "Error updating user", error: err });
-    }
-  },
-  deleteUserById: async (req: Request, res: Response) => {
-    try {
-      const userId = req.params.id;
-      const user = await UserRepository.findByIdAndDelete(userId);
-      if (!user) {
-        res.status(404).send({ message: "User not found" });
-        return;
-      }
-      res.status(200).send(user);
-    } catch (err) {
-      res.status(500).send({ message: "Error deleting user", error: err });
-    }
-  },
+    updateUserById: async (req: Request<Record<any, any>, {}, UpdateUserBody>, res: Response) => {
+        try {
+            const userId = req.params.id;
+            const { email, password } = req.body;
+            const user = await UserRepository.findById(userId);
+            if (!user) {
+                res.status(404).send({ message: 'User not found' });
+                return;
+            }
+            if (email) user.email = email;
+            if (password) {
+                const salt = await bcryptjs.genSalt(10);
+                user.password = await bcryptjs.hash(password, salt);
+            }
+            await user.save();
+            res.status(200).send(user);
+        } catch (err) {
+            res.status(500).send({ message: 'Error updating user', error: err });
+        }
+    },
+    deleteUserById: async (req: Request, res: Response) => {
+        try {
+            const userId = req.params.id;
+            const user = await UserRepository.findByIdAndDelete(userId);
+            if (!user) {
+                res.status(404).send({ message: 'User not found' });
+                return;
+            }
+            res.status(200).send(user);
+        } catch (err) {
+            res.status(500).send({ message: 'Error deleting user', error: err });
+        }
+    },
 };

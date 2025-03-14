@@ -1,14 +1,14 @@
 [
-  {
-    "email": "lior@gmail.com",
-    "password": "123456!",
-    "username": "lior",
-    "picture": "1"
-  },
-  {
-    "email": "rom@gmail.com",
-    "password": "123456",
-    "username": "rom",
-    "picture": "1"
-  }
+    {
+        "email": "lior@gmail.com",
+        "password": "123456!",
+        "username": "lior",
+        "picture": "1"
+    },
+    {
+        "email": "rom@gmail.com",
+        "password": "123456",
+        "username": "rom",
+        "picture": "1"
+    }
 ]

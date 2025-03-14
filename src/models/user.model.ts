@@ -1,13 +1,13 @@
 import { z } from 'zod';
-import { ObjectIdToString } from '../utils/zod.utils';
+import { ObjectIdToString, zodDate } from '../utils/zod.utils';
 
 export const UserSchema = z.object({
     username: z.string(),
     password: z.string(),
     email: z.string(),
     picture: z.string(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: zodDate,
+    updatedAt: zodDate,
     refreshTokens: z.string().array().optional(),
 });
 
