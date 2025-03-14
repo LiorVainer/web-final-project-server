@@ -6,10 +6,10 @@ const main = async () => {
     try {
         const server = await initApp();
         server.listen(port, () => {
-            console.log(`Example app listening at http://localhost:${port}`);
+            console.log(`server listening at http://localhost:${port}`);
         });
     } catch (error) {
-        console.error('Failed to initialize the app:', error);
+        console.error('Failed to initialize the server:', error);
     }
 };
 

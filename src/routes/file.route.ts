@@ -1,28 +1,10 @@
 import express from 'express';
+import { fileController } from '../controllers/file.controller';
+import { upload } from '../middlewares/file.middleware';
+
 const router = express.Router();
-import multer from 'multer';
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        console.log('file', file);
-        cb(null, 'public/');
-    },
-    filename: function (req, file, cb) {
-        const ext = file.originalname.split('.').filter(Boolean).slice(1).join('.');
-        console.log(ext);
+router.post('/', upload.single('file'), fileController.handleUpload);
+router.delete('/:url', fileController.deleteFile);
 
-        cb(null, Date.now() + '.' + ext);
-    },
-});
-const upload = multer({ storage: storage });
-
-router.post('/', upload.single('file'), (req, res) => {
-    const url = req.file?.path.replace(/\\/g, '/');
-    if (req.file) {
-        res.status(200).send({ url });
-    } else {
-        res.status(400).send({ error: 'File upload failed' });
-    }
-});
-
-export = router;
+export default router;
