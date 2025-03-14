@@ -17,10 +17,13 @@ export const matchExperienceController = {
 
     getAll: async (req: Request, res: Response) => {
         try {
-            const matchExperiences = await MatchExperienceRepository.find();
-            res.status(200).send(matchExperiences);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 5;
+
+            const result = await matchExperienceService.getAllMatchExperiences(page, limit);
+            res.status(200).json(result);
         } catch (err) {
-            res.status(500).send(err);
+            res.status(500).json({ error: 'Error fetching matchExperiences', details: err });
         }
     },
 

@@ -34,6 +34,24 @@ class MatchExperienceService {
             throw error;
         }
     };
+
+    getAllMatchExperiences = async (page: number, limit: number) => {
+        try {
+            const totalExperiences = await MatchExperienceRepository.countDocuments();
+            const experiences = await MatchExperienceRepository.find()
+                .sort({ createdAt: -1 }) // Sort by newest first
+                .skip((page - 1) * limit)
+                .limit(limit);
+
+            return {
+                experiences,
+                totalPages: Math.ceil(totalExperiences / limit),
+            };
+        } catch (error) {
+            console.error('Error fetching matchExperiences:', error);
+            throw error;
+        }
+    };
 }
 
 export const matchExperienceService = new MatchExperienceService();
