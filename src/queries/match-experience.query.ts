@@ -82,3 +82,19 @@ export const projectCommentUsersFields = {
         commentUsers: 0,
     },
 };
+
+
+export const projectCommentIds = {
+    $project: {
+        _id: 1, // Keep the main match experience ID
+        createdBy: 1, // Keep the reference to createdBy
+        user: 1, // Keep the populated user details
+        commentIds: {
+            $map: {
+                input: '$comments',
+                as: 'comment',
+                in: '$$comment._id',
+            },
+        },
+    },
+};

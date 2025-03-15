@@ -6,6 +6,7 @@ import {
     lookupCommentUsers,
     lookupCreatedByToUser,
     mapUsersToComments,
+    projectCommentIds,
     projectCommentUsersFields,
     projectUserFields,
     sortComments,
@@ -38,20 +39,47 @@ class MatchExperienceService {
     getAllMatchExperiences = async (page: number, limit: number) => {
         try {
             const totalExperiences = await MatchExperienceRepository.countDocuments();
-            const experiences = await MatchExperienceRepository.find()
-                .sort({ createdAt: -1 }) // Sort by newest first
-                .skip((page - 1) * limit)
-                .limit(limit);
-
+    
+            const experiences = await MatchExperienceRepository.aggregate([
+                lookupCreatedByToUser,
+                unwindUser,
+                projectUserFields,
+                lookupComments,
+                sortComments,
+                lookupCommentUsers,
+                mapUsersToComments,
+                projectCommentUsersFields,
+                { $sort: { createdAt: -1 } }, 
+                { $skip: (page - 1) * limit }, // Pagination
+                { $limit: limit },
+            ]);
+    
             return {
                 experiences,
                 totalPages: Math.ceil(totalExperiences / limit),
             };
         } catch (error) {
-            console.error('Error fetching matchExperiences:', error);
+            console.error('Error fetching match experiences:', error);
             throw error;
         }
     };
+
+    getAllByCreatedById = async (createdById: string) => {
+        try {
+            return await MatchExperienceRepository.aggregate([
+                { $match: { createdBy: new mongoose.Types.ObjectId(createdById) } },
+                lookupCreatedByToUser,
+                unwindUser,
+                projectUserFields,
+                lookupComments,
+                projectCommentIds,
+            ]);
+        } catch (error) {
+            console.error(`Error fetching match experiences created by user ${createdById}:`, error);
+            throw error;
+        }
+    };
+
 }
 
 export const matchExperienceService = new MatchExperienceService();
