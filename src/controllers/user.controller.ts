@@ -53,10 +53,13 @@ export const userController = {
                 return;
             }
 
-            console.log({ userId, ...req.body });
-            const updatedUser = await UserRepository.findByIdAndUpdate(userId, req.body);
-            console.log(updatedUser);
-            res.status(200).send(updatedUser);
+            const updatedUser = await UserRepository.findByIdAndUpdate(userId, req.body, { new: true });
+            if (!updatedUser) {
+                res.status(404).send({ message: 'User not found' });
+                return;
+            }
+            const { password, refreshTokens, ...publicUser } = updatedUser.toObject();
+            res.status(200).send(publicUser);
         } catch (err) {
             res.status(500).send({ message: 'Error updating user', error: err });
         }

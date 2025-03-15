@@ -223,7 +223,7 @@ export const googleLogin = async (req: Request, res: Response) => {
                 email: payload.email,
                 username: payload.name || '',
                 picture: payload.picture || '',
-                password: 'google-signin',
+                googleId: payload.sub,
             });
         }
 
@@ -253,6 +253,7 @@ export const googleLogin = async (req: Request, res: Response) => {
             ...publicUser,
         });
     } catch (err) {
+        console.error(err);
         res.status(500).send('Internal Server Error');
     }
 };
@@ -272,12 +273,17 @@ export const me = async (req: Request, res: Response) => {
         let publicUser: PublicUser | null = null;
         try {
             publicUser = jwt.verify(token, process.env.TOKEN_SECRET) as PublicUser;
+            let user = await UserRepository.findOne({ email: publicUser.email });
+            if (!user) {
+                res.status(401).send('Invalid token');
+                return;
+            }
+            const { password, refreshTokens, ...userPayload } = user.toObject();
+            res.status(200).send(userPayload);
         } catch (e) {
             res.status(401).send('Invalid token');
             return;
         }
-
-        res.status(200).send(publicUser);
     } catch (err) {
         console.log(err);
         res.status(500).send(err);
