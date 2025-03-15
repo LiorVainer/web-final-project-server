@@ -170,6 +170,8 @@ router.post("/", matchExperienceController.createMatchExperience);
  */
 router.get("/", matchExperienceController.getAll);
 
+router.get('/better-description', matchExperienceController.betterDescription);
+
 /**
  * @swagger
  * /match-experiences/{id}:
