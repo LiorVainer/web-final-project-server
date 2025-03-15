@@ -73,18 +73,38 @@ class MatchExperienceService {
     };
     
 
-    getAllByCreatedById = async (createdById: string) => {
+    getAllMatchExperiencesByUserId = async (userId: string, page: number, limit: number, sortBy: string = "date") => {
         try {
-            return await MatchExperienceRepository.aggregate([
-                { $match: { createdBy: new mongoose.Types.ObjectId(createdById) } },
+            const totalExperiences = await MatchExperienceRepository.countDocuments({ createdBy: userId });
+
+            let sortQuery: Record<string, 1 | -1> = { createdAt: -1 }; // Default: Newest first
+
+            if (sortBy === "likes") {
+                sortQuery = { likesCount: -1 }; // Sort by most liked
+            }
+
+            const experiences = await MatchExperienceRepository.aggregate<PipelineStage[]>([
+                { $match: { createdBy: new mongoose.Types.ObjectId(userId) } }, // ✅ Filter by user ID
                 lookupCreatedByToUser,
                 unwindUser,
                 projectUserFields,
                 lookupComments,
-                projectCommentIds,
+                sortComments,
+                lookupCommentUsers,
+                mapUsersToComments,
+                projectCommentUsersFields,
+                { $addFields: { likesCount: { $size: "$likes" } } }, // ✅ Compute likes count
+                { $sort: sortQuery },
+                { $skip: (page - 1) * limit },
+                { $limit: limit },
             ]);
+
+            return {
+                experiences,
+                totalPages: Math.ceil(totalExperiences / limit),
+            };
         } catch (error) {
-            console.error(`Error fetching match experiences created by user ${createdById}:`, error);
+            console.error(`Error fetching match experiences for user ${userId}:`, error);
             throw error;
         }
     };

@@ -28,6 +28,20 @@ export const matchExperienceController = {
         }
     },
 
+    getAllByUserId: async (req: Request, res: Response) => {
+        try {
+            const userId = req.params.userId;
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 5;
+            const sortBy = (req.query.sortBy as string) || "date"; // Default sorting: date
+    
+            const result = await matchExperienceService.getAllMatchExperiencesByUserId(userId, page, limit, sortBy);
+            res.status(200).json(result);
+        } catch (err) {
+            res.status(500).json({ error: `Error fetching match experiences for user`, details: err });
+        }
+    },
+
     getMatchExperienceById: async (req: Request, res: Response) => {
         try {
             const matchExpId = req.params.id;
