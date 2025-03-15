@@ -19,11 +19,12 @@ export const matchExperienceController = {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 5;
-
-            const result = await matchExperienceService.getAllMatchExperiences(page, limit);
+            const sortBy = (req.query.sortBy as string) || "date"; // Default sorting: date
+    
+            const result = await matchExperienceService.getAllMatchExperiences(page, limit, sortBy);
             res.status(200).json(result);
         } catch (err) {
-            res.status(500).json({ error: 'Error fetching matchExperiences', details: err });
+            res.status(500).json({ error: "Error fetching matchExperiences", details: err });
         }
     },
 
