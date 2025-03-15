@@ -34,10 +34,6 @@ class ChatService {
         }
     }
 
-    /**
-     * Fetch all chats for a given match experience.
-     * Sorts by last updated time.
-     */
     async getChatsForMatchExperience(matchExperienceId: string) {
         try {
             const chats = await ChatRepository.find({ matchExperienceId })

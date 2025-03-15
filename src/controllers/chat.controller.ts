@@ -9,7 +9,8 @@ export const chatController = {
             const { matchExperienceId, visitorId, matchExperienceCreatorId } = req.query;
 
             if (!matchExperienceId || !mongoose.Types.ObjectId.isValid(matchExperienceId)) {
-                return res.status(400).json({ error: 'Invalid or missing matchExperienceId' });
+                res.status(400).json({ error: 'Invalid or missing matchExperienceId' });
+                return;
             }
 
             if (visitorId && matchExperienceCreatorId) {
@@ -18,14 +19,17 @@ export const chatController = {
                     visitorId,
                     matchExperienceCreatorId
                 );
-                return res.status(200).json(chat);
+                res.status(200).json(chat);
+                return;
             }
 
             const chats = await chatService.getChatsForMatchExperience(matchExperienceId);
-            return res.status(200).json(chats);
+            res.status(200).json(chats);
+            return;
         } catch (error) {
             console.error('Error fetching chats:', error);
-            return res.status(500).json({ error: 'Error fetching chats' });
+            res.status(500).json({ error: 'Error fetching chats' });
+            return;
         }
     },
 };
