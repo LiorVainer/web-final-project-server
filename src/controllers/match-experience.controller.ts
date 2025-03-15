@@ -33,7 +33,8 @@ export const matchExperienceController = {
             const result = await matchExperienceService.getMatchExperienceById(matchExpId);
 
             if (!result) {
-                return res.status(404).send('MatchExperience not found');
+                res.status(404).send('MatchExperience not found');
+                return
             }
             res.status(200).send(result);
         } catch (err) {
