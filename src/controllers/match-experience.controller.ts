@@ -4,6 +4,8 @@ import { CommentRepository } from '../repositories/comment.repository';
 import mongoose from 'mongoose';
 import { CreateCommentDTO } from '../models/comment.model';
 import { matchExperienceService } from '../services/match-experience.service';
+import { AIService } from '../services/ai.service';
+import { formatObject } from '../utils/formatObject.utils';
 
 export const matchExperienceController = {
     createMatchExperience: async (req: Request, res: Response) => {
@@ -147,6 +149,20 @@ export const matchExperienceController = {
             res.status(200).send({ ok: true });
         } catch (err) {
             res.status(500).send(err);
+        }
+    },
+
+    betterDescription: async (req: Request, res: Response): Promise<Response> => {
+        try {
+            const prompt = `Generate a short, engaging match experience description based on these details. 
+            Capture the emotions, key moments, and atmosphere in a concise way. 
+            Only return the description itself—do not include introductions, explanations, or extra text. 
+            Match details: ${formatObject(req.query)}`;
+            const response = await AIService.generateText(prompt);
+            return res.status(200).json(response);
+        } catch (error) {
+            console.error('Error fetching response from AI:', error);
+            return res.status(500).json({ error: 'Error fetching response from AI' });
         }
     },
 };
