@@ -1,12 +1,12 @@
 import request from 'supertest';
 import { initApp } from '../server';
 import mongoose from 'mongoose';
-import { Express } from 'express';
 import { UserRepository } from '../repositories/user.repository';
 import { UserWithTokens } from '../types/user.types';
 import testUsers from './users_tests.json';
+import { Server } from 'socket.io';
 
-let app: Express;
+let app: Server<any, any>;
 
 const testUser: UserWithTokens = {
     email: 'test1@user.com',

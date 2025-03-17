@@ -47,19 +47,19 @@ export const userController = {
     updateUserById: async (req: Request<Record<any, any>, {}, UpdateUserBody>, res: Response) => {
         try {
             const userId = req.params.id;
-            const { email, password } = req.body;
             const user = await UserRepository.findById(userId);
             if (!user) {
                 res.status(404).send({ message: 'User not found' });
                 return;
             }
-            if (email) user.email = email;
-            if (password) {
-                const salt = await bcryptjs.genSalt(10);
-                user.password = await bcryptjs.hash(password, salt);
+
+            const updatedUser = await UserRepository.findByIdAndUpdate(userId, req.body, { new: true });
+            if (!updatedUser) {
+                res.status(404).send({ message: 'User not found' });
+                return;
             }
-            await user.save();
-            res.status(200).send(user);
+            const { password, refreshTokens, ...publicUser } = updatedUser.toObject();
+            res.status(200).send(publicUser);
         } catch (err) {
             res.status(500).send({ message: 'Error updating user', error: err });
         }

@@ -56,7 +56,7 @@ export class SocketService {
     /**
      * Handles sending messages between users in a match experience chat.
      */
-    private async handleSendMessage(socket: Socket, data: SendMessagePayload) {
+    private async handleSendMessage(data: SendMessagePayload) {
         const parsed = SendMessagePayloadSchema.safeParse(data);
         if (!parsed.success) {
             throw new Error(`Invalid sendMessage payload: ${parsed.error.format()}`);
@@ -123,7 +123,7 @@ export class SocketService {
             console.log(`User connected: ${socket.id}`);
 
             socket.on(SOCKET_EVENTS.JOIN_ROOM, (payload) => this.handleJoinRoom(socket, payload));
-            socket.on(SOCKET_EVENTS.SEND_MESSAGE, (data) => this.handleSendMessage(socket, data));
+            socket.on(SOCKET_EVENTS.SEND_MESSAGE, (data) => this.handleSendMessage(data));
             socket.on(SOCKET_EVENTS.DISCONNECT, () => this.handleDisconnect(socket));
         });
     }

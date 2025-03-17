@@ -1,6 +1,6 @@
 import express from 'express';
 import { userController } from '../controllers/user.controller';
-import { authMiddleware } from '../controllers/auth.controller';
+import { authMiddleware } from '../middlewares/auth.middlware';
 
 const router = express.Router();
 
@@ -71,7 +71,7 @@ const router = express.Router();
  *           description: The user's username
  *         picture:
  *           type: string
- *           description: The user's picture ID
+ *           description: The user's picture
  *       example:
  *         email: "newuser@gmail.com"
  *         password: "securepassword123"
@@ -92,7 +92,7 @@ const router = express.Router();
  *           description: The updated username
  *         picture:
  *           type: string
- *           description: The updated picture ID
+ *           description: The updated picture
  *       example:
  *         email: "updateduser@gmail.com"
  *         password: "newsecurepassword123"
