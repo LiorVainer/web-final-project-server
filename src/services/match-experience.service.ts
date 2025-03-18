@@ -41,10 +41,10 @@ class MatchExperienceService {
         try {
             const totalExperiences = await MatchExperienceRepository.countDocuments();
     
-            let sortQuery: Record<string, 1 | -1> = { createdAt: -1 }; // ✅ Fix type to only allow 1 or -1
+            let sortQuery: Record<string, 1 | -1> = { createdAt: -1 }; 
     
             if (sortBy === "likes") {
-                sortQuery = { likesCount: -1 }; // ✅ TypeScript now recognizes likesCount properly
+                sortQuery = { likesCount: -1 }; 
             }
     
             const experiences = await MatchExperienceRepository.aggregate<PipelineStage[]>([
@@ -56,8 +56,8 @@ class MatchExperienceService {
                 lookupCommentUsers,
                 mapUsersToComments,
                 projectCommentUsersFields,
-                { $addFields: { likesCount: { $size: "$likes" } } }, // ✅ Compute likesCount before sorting
-                { $sort: sortQuery }, // ✅ No more TypeScript error!
+                { $addFields: { likesCount: { $size: "$likes" } } }, 
+                { $sort: sortQuery }, 
                 { $skip: (page - 1) * limit },
                 { $limit: limit },
             ]);
@@ -77,14 +77,14 @@ class MatchExperienceService {
         try {
             const totalExperiences = await MatchExperienceRepository.countDocuments({ createdBy: userId });
 
-            let sortQuery: Record<string, 1 | -1> = { createdAt: -1 }; // Default: Newest first
+            let sortQuery: Record<string, 1 | -1> = { createdAt: -1 }; 
 
             if (sortBy === "likes") {
-                sortQuery = { likesCount: -1 }; // Sort by most liked
+                sortQuery = { likesCount: -1 }; 
             }
 
             const experiences = await MatchExperienceRepository.aggregate<PipelineStage[]>([
-                { $match: { createdBy: new mongoose.Types.ObjectId(userId) } }, // ✅ Filter by user ID
+                { $match: { createdBy: new mongoose.Types.ObjectId(userId) } }, 
                 lookupCreatedByToUser,
                 unwindUser,
                 projectUserFields,
@@ -93,7 +93,7 @@ class MatchExperienceService {
                 lookupCommentUsers,
                 mapUsersToComments,
                 projectCommentUsersFields,
-                { $addFields: { likesCount: { $size: "$likes" } } }, // ✅ Compute likes count
+                { $addFields: { likesCount: { $size: "$likes" } } }, 
                 { $sort: sortQuery },
                 { $skip: (page - 1) * limit },
                 { $limit: limit },
