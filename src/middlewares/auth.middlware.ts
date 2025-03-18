@@ -18,7 +18,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     try {
         const payload = jwt.verify(token, process.env.TOKEN_SECRET) as PublicUser;
-        req.params.userId = payload._id;
+        req.userId = payload._id;
         next();
     } catch (err) {
         res.status(401).send('Unauthorized');
