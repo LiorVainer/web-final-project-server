@@ -21,7 +21,7 @@ export const matchExperienceController = {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 5;
-            const sortBy = (req.query.sortBy as string) || "date"; // Default sorting: date
+            const sortBy = (req.query.sortBy as string) || "date";
     
             const result = await matchExperienceService.getAllMatchExperiences(page, limit, sortBy);
             res.status(200).json(result);
@@ -35,7 +35,7 @@ export const matchExperienceController = {
             const userId = req.params.userId;
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 5;
-            const sortBy = (req.query.sortBy as string) || "date"; // Default sorting: date
+            const sortBy = (req.query.sortBy as string) || "date";
     
             const result = await matchExperienceService.getAllMatchExperiencesByUserId(userId, page, limit, sortBy);
             res.status(200).json(result);
