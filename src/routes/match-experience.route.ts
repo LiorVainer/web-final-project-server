@@ -337,6 +337,75 @@ router.post('/', matchExperienceController.createMatchExperience);
  */
 router.get('/', matchExperienceController.getAll);
 
+/**
+ * @swagger
+ * /match-experiences/better-description:
+ *   get:
+ *     summary: Generate a better match experience description
+ *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
+ *     parameters:
+ *       - in: query
+ *         name: homeTeam
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The home team name
+ *       - in: query
+ *         name: awayTeam
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The away team name
+ *       - in: query
+ *         name: matchDate
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         required: false
+ *         description: The date and time of the match
+ *       - in: query
+ *         name: league
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The league of the match
+ *       - in: query
+ *         name: country
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The country where the match is played
+ *       - in: query
+ *         name: stadium
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The stadium where the match is played
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The title of the match experience
+ *       - in: query
+ *         name: description
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: A brief description of the match experience
+ *     responses:
+ *       200:
+ *         description: The AI-generated match experience description
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "A thrilling match where the home team made a last-minute comeback, sending the fans into a frenzy!"
+ *       500:
+ *         description: Error generating match experience description
+ */
 router.get('/better-description', matchExperienceController.betterDescription);
 
 /**
