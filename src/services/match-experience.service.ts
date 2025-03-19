@@ -2,6 +2,7 @@ import { PopulatedMatchExperience } from '../models/match-experience.model';
 import { MatchExperienceRepository } from '../repositories/match-experience.repository';
 import mongoose from 'mongoose';
 import {
+    likesCountQuery,
     lookupComments,
     lookupCommentUsers,
     lookupCreatedByToUser,
@@ -56,7 +57,7 @@ class MatchExperienceService {
                 lookupCommentUsers,
                 mapUsersToComments,
                 projectCommentUsersFields,
-                { $addFields: { likesCount: { $size: "$likes" } } }, 
+                likesCountQuery, 
                 { $sort: sortQuery }, 
                 { $skip: (page - 1) * limit },
                 { $limit: limit },
@@ -93,7 +94,7 @@ class MatchExperienceService {
                 lookupCommentUsers,
                 mapUsersToComments,
                 projectCommentUsersFields,
-                { $addFields: { likesCount: { $size: "$likes" } } }, 
+                likesCountQuery, 
                 { $sort: sortQuery },
                 { $skip: (page - 1) * limit },
                 { $limit: limit },

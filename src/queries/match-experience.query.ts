@@ -98,3 +98,5 @@ export const projectCommentIds = {
         },
     },
 };
+
+export const likesCountQuery = { $addFields: { likesCount: { $size: "$likes" } } };
