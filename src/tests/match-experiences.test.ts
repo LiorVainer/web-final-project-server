@@ -4,27 +4,23 @@ import mongoose from 'mongoose';
 import { Express } from 'express';
 import { MatchExperienceRepository } from '../repositories/match-experience.repository';
 import { UserRepository } from '../repositories/user.repository';
-import { MatchExperience } from '../models/match-experience.model';
+import { MatchExperiencePayload } from '../models/match-experience.model';
 
 let app: Express;
 let userAccessToken = '';
 let matchExperienceId = '';
 let createdBy = '';
 
-// TODO: Need fix mock data, because schema has changed
-const testMatchExperience: MatchExperience = {
+// TODO: Fixed it, need to check working with test
+const testMatchExperience: MatchExperiencePayload = {
     homeTeam: 'Team A',
     awayTeam: 'Team B',
-    matchDate: new Date().toISOString(),
+    matchDate: new Date(),
     league: 'Premier League',
     country: 'England',
     stadium: 'Wembley Stadium',
     title: 'Exciting Match!',
     description: 'This will be an intense match between top teams.',
-    likes: [],
-    comments: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
 };
 
 const testUser = {
