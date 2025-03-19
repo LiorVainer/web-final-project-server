@@ -1,16 +1,18 @@
 import request from 'supertest';
-import { initApp } from '../server';
+import { initServer } from '../server';
 import mongoose from 'mongoose';
 import { Express } from 'express';
 import { MatchExperienceRepository } from '../repositories/match-experience.repository';
 import { UserRepository } from '../repositories/user.repository';
+import { MatchExperience } from '../models/match-experience.model';
 
 let app: Express;
 let userAccessToken = '';
 let matchExperienceId = '';
 let createdBy = '';
 
-const testMatchExperience = {
+// TODO: Need fix mock data, because schema has changed
+const testMatchExperience: MatchExperience = {
     homeTeam: 'Team A',
     awayTeam: 'Team B',
     matchDate: new Date().toISOString(),
@@ -33,7 +35,8 @@ const testUser = {
 };
 
 beforeAll(async () => {
-    app = await initApp();
+    const res = await initServer();
+    app = res.app;
     await UserRepository.deleteMany();
     await MatchExperienceRepository.deleteMany();
 

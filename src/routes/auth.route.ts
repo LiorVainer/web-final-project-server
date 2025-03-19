@@ -1,9 +1,10 @@
 import express from 'express';
 import * as authController from '../controllers/auth.controller';
+import { authMiddleware } from '../middlewares/auth.middlware';
 
 const router = express.Router();
 
-router.get('/me', authController.me);
+router.get('/me', authMiddleware, authController.me);
 
 router.post('/google', authController.googleLogin);
 
@@ -135,7 +136,7 @@ router.post('/login', authController.login);
  *       500:
  *         description: Server error
  */
-router.post('/refresh', authController.refresh);
+router.post('/refresh', authMiddleware, authController.refresh);
 
 /**
  * @swagger
@@ -157,6 +158,6 @@ router.post('/refresh', authController.refresh);
  *       500:
  *         description: Server error
  */
-router.post('/logout', authController.logout);
+router.post('/logout', authMiddleware, authController.logout);
 
 export default router;

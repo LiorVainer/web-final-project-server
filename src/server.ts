@@ -12,7 +12,7 @@ import { handleErrorMiddleware } from './middlewares/error.middleware';
 import fileRoutes from './routes/file.route';
 import chatRoutes from './routes/chat.route';
 import soccerRoutes from './routes/soccer.route';
-import { createServer } from 'http'; // Import HTTP server
+import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { initializeSocket } from './socket';
 
@@ -57,7 +57,7 @@ app.use('/public', express.static('public'));
 
 initializeSocket(io);
 
-export const initApp = async () => {
+export const initServer = async () => {
     const dbConnect = process.env.DB_CONNECT;
     if (!dbConnect) {
         throw new Error('DB_CONNECT is not defined in .env file');
@@ -65,7 +65,7 @@ export const initApp = async () => {
 
     try {
         await mongoose.connect(dbConnect);
-        return server;
+        return { server, app };
     } catch (error) {
         throw error;
     }

@@ -1,12 +1,12 @@
 import request from 'supertest';
-import { initApp } from '../server';
+import { initServer } from '../server';
 import mongoose from 'mongoose';
 import { UserRepository } from '../repositories/user.repository';
 import { UserWithTokens } from '../types/user.types';
 import testUsers from './users_tests.json';
-import { Server } from 'socket.io';
+import { Application } from 'express';
 
-let app: Server<any, any>;
+let app: Application;
 
 const testUser: UserWithTokens = {
     email: 'test1@user.com',
@@ -16,7 +16,8 @@ const testUser: UserWithTokens = {
 };
 
 beforeAll(async () => {
-    app = await initApp();
+    const res = await initServer();
+    app = res.app;
     await UserRepository.deleteMany();
 
     const registerResponse = await request(app).post('/auth/register').send(testUser);
