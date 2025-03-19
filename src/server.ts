@@ -28,15 +28,26 @@ app.use(bodyParser.json());
 app.use(cors({ origin: '*', credentials: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const port = process.env.PORT;
+
 const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: ' Sport Scanner REST API',
+            title: 'Sport Scanner REST API',
             version: '1.0.0',
             description: 'REST server including authentication using JWT',
         },
-        servers: [{ url: 'http://localhost:3000' }],
+        servers: [{ url: `http://localhost:${port}` }],
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
     },
     apis: ['./src/routes/*.ts'],
 };
