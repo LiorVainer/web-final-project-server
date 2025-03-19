@@ -6,6 +6,12 @@ import { CreateCommentDTO } from '../models/comment.model';
 import { matchExperienceService } from '../services/match-experience.service';
 import { AIService } from '../services/ai.service';
 import { formatObject } from '../utils/formatObject.utils';
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const PAGE_DEFAULT = parseInt(process.env.PAGE_DEFAULT as string) || 1;
+const LIMIT_DEFAULT = parseInt(process.env.LIMIT_DEFAULT as string) || 5;
 
 export const matchExperienceController = {
     createMatchExperience: async (req: Request, res: Response) => {
@@ -19,8 +25,8 @@ export const matchExperienceController = {
 
     getAll: async (req: Request, res: Response) => {
         try {
-            const page = parseInt(req.query.page as string) || 1;
-            const limit = parseInt(req.query.limit as string) || 5;
+            const page = parseInt(req.query.page as string) || PAGE_DEFAULT;
+            const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
             const sortBy = (req.query.sortBy as string) || "date";
     
             const result = await matchExperienceService.getAllMatchExperiences(page, limit, sortBy);
@@ -33,8 +39,8 @@ export const matchExperienceController = {
     getAllByUserId: async (req: Request, res: Response) => {
         try {
             const userId = req.params.userId;
-            const page = parseInt(req.query.page as string) || 1;
-            const limit = parseInt(req.query.limit as string) || 5;
+            const page = parseInt(req.query.page as string) || PAGE_DEFAULT;
+            const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
             const sortBy = (req.query.sortBy as string) || "date";
     
             const result = await matchExperienceService.getAllMatchExperiencesByUserId(userId, page, limit, sortBy);
