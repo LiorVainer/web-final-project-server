@@ -64,7 +64,7 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.post('/', authMiddleware, upload.single('file'), fileController.handleUpload);
+router.post('/', upload.single('file'), fileController.handleUpload);
 
 /**
  * @swagger
@@ -90,6 +90,5 @@ router.post('/', authMiddleware, upload.single('file'), fileController.handleUpl
  *         description: Failed to delete file
  */
 router.delete('/:url', authMiddleware, fileController.deleteFile);
-
 
 export default router;

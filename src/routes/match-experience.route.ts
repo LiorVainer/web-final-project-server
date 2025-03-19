@@ -10,7 +10,7 @@ router.use(authMiddleware);
  * @swagger
  * tags:
  *   name: MatchExperiences
- *   description: MatchExperience management API
+ *   description: Match Experience management API
  */
 
 /**
@@ -40,7 +40,7 @@ router.use(authMiddleware);
  *           example: "67dacda28919860ef0a10384"
  *         matchExperienceId:
  *           type: string
- *           description: The ID of the matchExperience being commented on
+ *           description: The ID of the match experience being commented on
  *           example: "67da9113c748e6d02ba1f469"
  *         userId:
  *           type: string
@@ -64,6 +64,51 @@ router.use(authMiddleware);
  *           type: integer
  *           description: Version key for document changes tracking
  *           example: 0
+ *
+ *     PopulatedComment:
+ *       type: object
+ *       required:
+ *         - _id
+ *         - matchExperienceId
+ *         - userId
+ *         - content
+ *         - createdAt
+ *         - updatedAt
+ *         - user
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The unique identifier of the comment
+ *           example: "67db1efa81cd8cfa67c44efe"
+ *         matchExperienceId:
+ *           type: string
+ *           description: The ID of the match experience being commented on
+ *           example: "67db1eea81cd8cfa67c44ef2"
+ *         userId:
+ *           type: string
+ *           description: The ID of the user who made the comment
+ *           example: "67daf63a7d59e2068372d409"
+ *         content:
+ *           type: string
+ *           description: The content of the comment
+ *           example: "awdwadwad"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The timestamp when the comment was created
+ *           example: "2025-03-19T19:46:02.496Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: The timestamp when the comment was last updated
+ *           example: "2025-03-19T19:46:02.496Z"
+ *         __v:
+ *           type: integer
+ *           description: Version key for document changes tracking
+ *           example: 0
+ *         user:
+ *           $ref: '#/components/schemas/PublicUser'
+ *
  *     CommentPayload:
  *       type: object
  *       required:
@@ -74,7 +119,7 @@ router.use(authMiddleware);
  *       properties:
  *         matchExperienceId:
  *           type: string
- *           description: The ID of the matchExperience being commented on
+ *           description: The ID of the match experience being commented on
  *         userId:
  *           type: string
  *           description: The ID of the user who made the comment
@@ -85,6 +130,68 @@ router.use(authMiddleware);
  *           type: string
  *           format: date-time
  *           description: The timestamp when the comment was created
+ *
+ *     PopulatedMatchExperience:
+ *       type: object
+ *       required:
+ *         - homeTeam
+ *         - awayTeam
+ *         - matchDate
+ *         - league
+ *         - country
+ *         - stadium
+ *         - title
+ *         - description
+ *       properties:
+ *         homeTeam:
+ *           type: string
+ *           description: The name of the home team
+ *         awayTeam:
+ *           type: string
+ *           description: The name of the away team
+ *         matchDate:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time of the match
+ *         league:
+ *           type: string
+ *           description: The league of the match
+ *         country:
+ *           type: string
+ *           description: The country of the match
+ *         stadium:
+ *           type: string
+ *           description: The stadium where the match will be held
+ *         title:
+ *           type: string
+ *           description: The title of the match experience
+ *         description:
+ *           type: string
+ *           description: A detailed description of the match experience
+ *         createdBy:
+ *           type: string
+ *           description: The ID of the user who created the match experience
+ *         likes:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: A list of user IDs who liked the match experience
+ *         comments:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/PopulatedComment'
+ *           description: A list of populated comments including user details
+ *         picture:
+ *           type: string
+ *           description: Optional picture URL for the match experience
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The time when the match experience was created
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: The time when the match experience was last updated
  *
  *     MatchExperience:
  *       type: object
@@ -198,13 +305,13 @@ router.use(authMiddleware);
  *                 type: string
  *     responses:
  *       200:
- *         description: The created matchExperience
+ *         description: The created match experience
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/MatchExperience'
  *       500:
- *         description: Error creating matchExperience
+ *         description: Error creating match experience
  */
 router.post('/', matchExperienceController.createMatchExperience);
 
@@ -212,13 +319,13 @@ router.post('/', matchExperienceController.createMatchExperience);
  * @swagger
  * /match-experiences:
  *   get:
- *     summary: Get all matchExperiences
+ *     summary: Get all match experiences
  *     tags: [MatchExperiences]
  *     security:
  *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     responses:
  *       200:
- *         description: A list of matchExperiences
+ *         description: A list of match experiences
  *         content:
  *           application/json:
  *             schema:
@@ -226,7 +333,7 @@ router.post('/', matchExperienceController.createMatchExperience);
  *               items:
  *                 $ref: '#/components/schemas/MatchExperience'
  *       500:
- *         description: Error fetching matchExperiences
+ *         description: Error fetching match experiences
  */
 router.get('/', matchExperienceController.getAll);
 
@@ -301,18 +408,18 @@ router.get('/user/:userId', matchExperienceController.getAllByUserId);
  *         schema:
  *           type: string
  *         required: true
- *         description: The matchExperience ID
+ *         description: The match experience ID
  *     responses:
  *       200:
- *         description: The matchExperience data
+ *         description: The match experience data
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/MatchExperience'
+ *               $ref: '#/components/schemas/PopulatedMatchExperience'
  *       404:
- *         description: MatchExperience not found
+ *         description: match experience not found
  *       500:
- *         description: Error fetching matchExperience
+ *         description: Error fetching match experience
  */
 router.get('/:id', matchExperienceController.getMatchExperienceById);
 
@@ -330,7 +437,7 @@ router.get('/:id', matchExperienceController.getMatchExperienceById);
  *         schema:
  *           type: string
  *         required: true
- *         description: The matchExperience ID
+ *         description: The match experience ID
  *     requestBody:
  *       required: true
  *       content:
@@ -357,15 +464,15 @@ router.get('/:id', matchExperienceController.getMatchExperienceById);
  *                 type: string
  *     responses:
  *       200:
- *         description: The updated matchExperience
+ *         description: The updated match experience
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/MatchExperience'
  *       404:
- *         description: MatchExperience not found
+ *         description: match experience not found
  *       500:
- *         description: Error updating matchExperience
+ *         description: Error updating match experience
  */
 router.put('/:id', matchExperienceController.updateMatchExperience);
 
@@ -373,7 +480,7 @@ router.put('/:id', matchExperienceController.updateMatchExperience);
  * @swagger
  * /match-experiences/{id}:
  *   delete:
- *     summary: Delete a matchExperience by ID
+ *     summary: Delete a match experience by ID
  *     tags: [MatchExperiences]
  *     security:
  *       - BearerAuth: []  # Require Bearer token for this endpoint
@@ -383,14 +490,14 @@ router.put('/:id', matchExperienceController.updateMatchExperience);
  *         schema:
  *           type: string
  *         required: true
- *         description: The matchExperience ID
+ *         description: The match experience ID
  *     responses:
  *       200:
- *         description: The deleted matchExperience
+ *         description: The deleted match experience
  *       404:
- *         description: MatchExperience not found
+ *         description: match experience not found
  *       500:
- *         description: Error deleting matchExperience
+ *         description: Error deleting match experience
  */
 router.delete('/:id', matchExperienceController.deleteMatchExperience);
 
@@ -398,7 +505,7 @@ router.delete('/:id', matchExperienceController.deleteMatchExperience);
  * @swagger
  * /match-experiences/{id}/comments:
  *   post:
- *     summary: Add a comment to a matchExperience
+ *     summary: Add a comment to a match experience
  *     tags: [MatchExperiences]
  *     security:
  *       - BearerAuth: []  # Require Bearer token for this endpoint
@@ -408,7 +515,7 @@ router.delete('/:id', matchExperienceController.deleteMatchExperience);
  *         schema:
  *           type: string
  *         required: true
- *         description: The matchExperience ID
+ *         description: The match experience ID
  *     requestBody:
  *       required: true
  *       content:
@@ -427,7 +534,7 @@ router.post('/:id/comments', matchExperienceController.addComment);
  * @swagger
  * /match-experiences/{id}/like:
  *   post:
- *     summary: Like a matchExperience
+ *     summary: Like a match experience
  *     tags: [MatchExperiences]
  *     security:
  *       - BearerAuth: []  # Require Bearer token for this endpoint
@@ -437,12 +544,12 @@ router.post('/:id/comments', matchExperienceController.addComment);
  *         schema:
  *           type: string
  *         required: true
- *         description: The matchExperience ID
+ *         description: The match experience ID
  *     responses:
  *       200:
- *         description: MatchExperience liked
+ *         description: match experience liked
  *       500:
- *         description: Error liking matchExperience
+ *         description: Error liking match experience
  */
 router.post('/:id/like', matchExperienceController.likeMatchExperience);
 
