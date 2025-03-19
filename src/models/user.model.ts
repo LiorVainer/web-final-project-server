@@ -13,22 +13,21 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 
-export const UserWithId = UserSchema.extend({
+export const UserWithIdSchema = UserSchema.extend({
     _id: ObjectIdToString,
 });
 
-export const PublicUserSchema = UserWithId.omit({
+export const PublicUserSchema = UserWithIdSchema.omit({
     password: true,
     refreshTokens: true,
 });
 
-export type PublicUser = z.infer<typeof PublicUserSchema>;
-
-export type UserWithId = z.infer<typeof UserWithId>;
+export type UserWithId = z.infer<typeof UserWithIdSchema>;
 
 export const UserWithoutTimestampsSchema = UserSchema.omit({
     createdAt: true,
     updatedAt: true,
 });
 
+export type PublicUser = z.infer<typeof PublicUserSchema>;
 export type UserPayload = z.infer<typeof UserWithoutTimestampsSchema>;

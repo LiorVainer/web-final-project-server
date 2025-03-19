@@ -1,58 +1,64 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import bcryptjs from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { UserDocument, UserRepository } from '../repositories/user.repository';
 import { RefreshResponse, RefreshTokenBody, Tokens } from '../types/auth.types';
-import { User, UserPayload } from '../models/user.model';
+import { PublicUser, User, UserPayload } from '../models/user.model';
+import { OAuth2Client } from 'google-auth-library';
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register: RequestHandler<Record<any, any>, User | unknown, UserPayload> = async (req, res) => {
     try {
         const password = req.body.password;
         const salt = await bcryptjs.genSalt(10);
         const hashedPassword = await bcryptjs.hash(password, salt);
-        const user = await UserRepository.create({
+        const userPayload = {
             email: req.body.email,
             password: hashedPassword,
             username: req.body.username,
             picture: req.body.picture,
-        });
+        };
+        const user = await UserRepository.create(userPayload);
+        const { password: _password, refreshTokens, ...publicUser } = user.toObject();
 
-        res.status(200).send(user);
+        const userResponsePayload: PublicUser = {
+            ...publicUser,
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(userResponsePayload);
+
+        if (!tokens) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        user.refreshTokens?.push(tokens.refreshToken);
+        await user.save();
+
+        res.status(200).send({ ...userResponsePayload, ...tokens });
     } catch (err) {
         res.status(500).send(err);
     }
 };
 
-export const generateTokens = (userId: string): Tokens | null => {
+export const generateTokens = (user: PublicUser): Tokens | null => {
     if (!process.env.TOKEN_SECRET) {
         return null;
     }
 
-    // generate token
-    const random = Math.random().toString();
-    const accessToken = jwt.sign(
-        {
-            _id: userId,
-            random,
-        },
-        process.env.TOKEN_SECRET,
-        { expiresIn: process.env.TOKEN_EXPIRES as SignOptions['expiresIn'] }
-    );
+    const accessToken = jwt.sign(user, process.env.TOKEN_SECRET, {
+        expiresIn: process.env.TOKEN_EXPIRES as SignOptions['expiresIn'],
+    });
 
-    const refreshToken = jwt.sign(
-        {
-            _id: userId,
-            random,
-        },
-        process.env.TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'],
-        }
-    );
+    const refreshToken = jwt.sign(user, process.env.TOKEN_SECRET, {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'],
+    });
 
     return {
-        accessToken: accessToken,
-        refreshToken: refreshToken,
+        accessToken,
+        refreshToken,
     };
 };
 
@@ -60,12 +66,12 @@ export const login = async (req: Request, res: Response) => {
     try {
         const user = await UserRepository.findOne({ email: req.body.email });
         if (!user) {
-            res.status(400).send('wrong username or password');
+            res.status(401).send('wrong username or password');
             return;
         }
         const validPassword = await bcryptjs.compare(req.body.password, user.password);
         if (!validPassword) {
-            res.status(400).send('wrong username or password');
+            res.status(401).send('wrong username or password');
             return;
         }
         if (!process.env.TOKEN_SECRET) {
@@ -76,8 +82,14 @@ export const login = async (req: Request, res: Response) => {
             user.refreshTokens = [];
         }
 
-        // generate token
-        const tokens = generateTokens(user._id.toString());
+        const { password, refreshTokens, ...publicUser } = user.toObject();
+
+        const userResponsePayload: PublicUser = {
+            ...publicUser,
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(userResponsePayload);
 
         if (!tokens) {
             res.status(500).send('Server Error');
@@ -88,9 +100,8 @@ export const login = async (req: Request, res: Response) => {
         await user.save();
 
         res.status(200).send({
-            accessToken: tokens.accessToken,
-            refreshToken: tokens.refreshToken,
-            _id: user._id,
+            ...tokens,
+            ...userResponsePayload,
         });
     } catch (err) {
         res.status(500).send(err);
@@ -108,7 +119,7 @@ const verifyRefreshToken = async (refreshToken: string | undefined) => {
     let user: UserDocument | null = null;
 
     try {
-        const payload = jwt.verify(refreshToken, process.env.TOKEN_SECRET) as Payload;
+        const payload = jwt.verify(refreshToken, process.env.TOKEN_SECRET) as PublicUser;
         user = await UserRepository.findById(payload._id);
 
         if (!user) {
@@ -155,7 +166,14 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
             return;
         }
 
-        const tokens = generateTokens(user._id);
+        const { refreshTokens, ...userPayload } = user.toObject();
+
+        const publicUser: PublicUser = {
+            ...userPayload,
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(publicUser);
 
         if (!tokens) {
             res.status(500).send('Server Error');
@@ -179,29 +197,95 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
     }
 };
 
-type Payload = {
-    _id: string;
+export const googleLogin = async (req: Request, res: Response) => {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            res.status(400).send('Invalid Google token');
+            return;
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+
+        const payload = ticket.getPayload();
+        if (!payload || !payload.email) {
+            return;
+        }
+
+        let user = await UserRepository.findOne({ email: payload.email });
+
+        if (!user) {
+            user = await UserRepository.create({
+                email: payload.email,
+                username: payload.name || '',
+                picture: payload.picture || '',
+                googleId: payload.sub,
+            });
+        }
+
+        const { refreshTokens, ...userPayload } = user.toObject();
+
+        const publicUser: PublicUser = {
+            ...userPayload,
+            _id: user._id.toString(),
+        };
+
+        const tokens = generateTokens(publicUser);
+
+        if (!tokens) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        if (!user.refreshTokens) {
+            user.refreshTokens = [];
+        }
+
+        user.refreshTokens.push(tokens.refreshToken);
+        await user.save();
+
+        res.status(200).send({
+            ...tokens,
+            ...publicUser,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Internal Server Error');
+    }
 };
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const authorization = req.header('authorization');
-
-    const token = authorization && authorization.split(' ')[1];
-
-    if (!token) {
-        res.status(401).send('Unauthorized');
-        return;
-    }
-    if (!process.env.TOKEN_SECRET) {
-        res.status(500).send('Server Error');
-        return;
-    }
-
+export const me = async (req: Request, res: Response) => {
     try {
-        const payload = jwt.verify(token, process.env.TOKEN_SECRET) as Payload;
-        req.params.userId = payload._id;
-        next();
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            res.status(401).send('Token not found');
+            return;
+        }
+        if (!process.env.TOKEN_SECRET) {
+            res.status(500).send('Server Error');
+            return;
+        }
+
+        let publicUser: PublicUser | null = null;
+        try {
+            publicUser = jwt.verify(token, process.env.TOKEN_SECRET) as PublicUser;
+            let user = await UserRepository.findOne({ email: publicUser.email });
+            if (!user) {
+                res.status(401).send('Invalid token');
+                return;
+            }
+            const { password, refreshTokens, ...userPayload } = user.toObject();
+            res.status(200).send(userPayload);
+        } catch (e) {
+            res.status(401).send('Invalid token');
+            return;
+        }
     } catch (err) {
-        res.status(401).send('Unauthorized');
+        console.log(err);
+        res.status(500).send(err);
     }
 };

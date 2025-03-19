@@ -16,7 +16,10 @@ const LIMIT_DEFAULT = parseInt(process.env.LIMIT_DEFAULT as string) || 5;
 export const matchExperienceController = {
     createMatchExperience: async (req: Request, res: Response) => {
         try {
-            const matchExperience = await MatchExperienceRepository.create(req.body);
+            const matchExperience = await MatchExperienceRepository.create({
+                ...req.body,
+                createdBy: req.userId,
+            });
             res.status(200).send(matchExperience);
         } catch (err) {
             res.status(500).send(err);
@@ -57,7 +60,7 @@ export const matchExperienceController = {
 
             if (!result) {
                 res.status(404).send('MatchExperience not found');
-                return
+                return;
             }
             res.status(200).send(result);
         } catch (err) {
@@ -158,17 +161,17 @@ export const matchExperienceController = {
         }
     },
 
-    betterDescription: async (req: Request, res: Response): Promise<Response> => {
+    betterDescription: async (req: Request, res: Response) => {
         try {
             const prompt = `Generate a short, engaging match experience description based on these details. 
             Capture the emotions, key moments, and atmosphere in a concise way. 
             Only return the description itself—do not include introductions, explanations, or extra text. 
             Match details: ${formatObject(req.query)}`;
             const response = await AIService.generateText(prompt);
-            return res.status(200).json(response);
+            res.status(200).json(response);
         } catch (error) {
             console.error('Error fetching response from AI:', error);
-            return res.status(500).json({ error: 'Error fetching response from AI' });
+            res.status(500).json({ error: 'Error fetching response from AI' });
         }
     },
 };

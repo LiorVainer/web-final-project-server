@@ -1,6 +1,12 @@
-import express from "express";
-import * as authController from "../controllers/auth.controller";
+import express from 'express';
+import * as authController from '../controllers/auth.controller';
+import { authMiddleware } from '../middlewares/auth.middlware';
+
 const router = express.Router();
+
+router.get('/me', authMiddleware, authController.me);
+
+router.post('/google', authController.googleLogin);
 
 /**
  * @swagger
@@ -78,7 +84,7 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.post("/register", authController.register);
+router.post('/register', authController.register);
 
 /**
  * @swagger
@@ -104,7 +110,7 @@ router.post("/register", authController.register);
  *       500:
  *         description: Server error
  */
-router.post("/login", authController.login);
+router.post('/login', authController.login);
 
 /**
  * @swagger
@@ -130,7 +136,7 @@ router.post("/login", authController.login);
  *       500:
  *         description: Server error
  */
-router.post("/refresh", authController.refresh);
+router.post('/refresh', authMiddleware, authController.refresh);
 
 /**
  * @swagger
@@ -152,6 +158,6 @@ router.post("/refresh", authController.refresh);
  *       500:
  *         description: Server error
  */
-router.post("/logout", authController.logout);
+router.post('/logout', authMiddleware, authController.logout);
 
 export default router;

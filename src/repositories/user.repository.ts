@@ -1,15 +1,13 @@
-import { refresh } from '../controllers/auth.controller';
 import mongoose, { Document, Schema } from 'mongoose';
-import { z } from 'zod';
-import { ObjectIdSchema, ObjectIdToString } from '../utils/zod.utils';
 import { User } from '../models/user.model';
 
 const UserMongoSchema = new Schema(
     {
         username: { type: String, required: true },
-        password: { type: String, required: true },
+        password: { type: String },
         email: { type: String, required: true },
         picture: { type: String, required: true },
+        googleId: { type: String },
         refreshTokens: { type: [String], default: [] },
     },
     {

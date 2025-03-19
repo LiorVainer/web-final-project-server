@@ -1,14 +1,17 @@
-import { Router } from "express";
-import { soccerController } from "../controllers/soccer.controller";
+import { Router } from 'express';
+import { soccerController } from '../controllers/soccer.controller';
+import { authMiddleware } from '../middlewares/auth.middlware';
 
 const router = Router();
 
-router.get("/countries", soccerController.getCountries);
+router.use(authMiddleware);
 
-router.get("/leagues", soccerController.getLeagues);
+router.get('/countries', soccerController.getCountries);
 
-router.get("/venues", soccerController.getVenues);
+router.get('/leagues', soccerController.getLeagues);
 
-router.get("/teams", soccerController.getTeams);
+router.get('/venues', soccerController.getVenues);
+
+router.get('/teams', soccerController.getTeams);
 
 export default router;

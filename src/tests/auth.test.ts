@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { initApp } from '../server';
+import { initServer } from '../server';
 import mongoose from 'mongoose';
 import { Express } from 'express';
 import { UserRepository } from '../repositories/user.repository';
@@ -18,7 +18,8 @@ const testUser: UserWithTokens = {
 
 beforeAll(async () => {
     console.log('beforeAll');
-    app = await initApp();
+    const res = await initServer();
+    app = res.app;
     await UserRepository.deleteMany();
 });
 

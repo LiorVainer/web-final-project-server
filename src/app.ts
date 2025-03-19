@@ -1,10 +1,10 @@
-import { initApp } from './server';
+import { initServer } from './server';
 
 const port = process.env.PORT;
 
 const main = async () => {
     try {
-        const server = await initApp();
+        const { server } = await initServer();
         server.listen(port, () => {
             console.log(`server listening at http://localhost:${port}`);
         });

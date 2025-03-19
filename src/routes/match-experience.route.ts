@@ -1,7 +1,10 @@
-import { Router } from "express";
-import { matchExperienceController } from "../controllers/match-experience.controller";
+import { Router } from 'express';
+import { matchExperienceController } from '../controllers/match-experience.controller';
+import { authMiddleware } from '../middlewares/auth.middlware';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -148,7 +151,7 @@ const router = Router();
  *       500:
  *         description: Error creating matchExperience
  */
-router.post("/", matchExperienceController.createMatchExperience);
+router.post('/', matchExperienceController.createMatchExperience);
 
 /**
  * @swagger
@@ -168,7 +171,7 @@ router.post("/", matchExperienceController.createMatchExperience);
  *       500:
  *         description: Error fetching matchExperiences
  */
-router.get("/", matchExperienceController.getAll);
+router.get('/', matchExperienceController.getAll);
 
 router.get('/better-description', matchExperienceController.betterDescription);
 
@@ -250,7 +253,7 @@ router.get("/user/:userId", matchExperienceController.getAllByUserId);
  *       500:
  *         description: Error fetching matchExperience
  */
-router.get("/:id", matchExperienceController.getMatchExperienceById);
+router.get('/:id', matchExperienceController.getMatchExperienceById);
 
 /**
  * @swagger
@@ -301,7 +304,7 @@ router.get("/:id", matchExperienceController.getMatchExperienceById);
  *       500:
  *         description: Error updating matchExperience
  */
-router.put("/:id", matchExperienceController.updateMatchExperience);
+router.put('/:id', matchExperienceController.updateMatchExperience);
 
 /**
  * @swagger
@@ -324,7 +327,7 @@ router.put("/:id", matchExperienceController.updateMatchExperience);
  *       500:
  *         description: Error deleting matchExperience
  */
-router.delete("/:id", matchExperienceController.deleteMatchExperience);
+router.delete('/:id', matchExperienceController.deleteMatchExperience);
 
 /**
  * @swagger
@@ -361,7 +364,7 @@ router.delete("/:id", matchExperienceController.deleteMatchExperience);
  *       500:
  *         description: Error adding comment
  */
-router.post("/:id/comments", matchExperienceController.addComment);
+router.post('/:id/comments', matchExperienceController.addComment);
 
 /**
  * @swagger
@@ -395,7 +398,7 @@ router.post("/:id/comments", matchExperienceController.addComment);
  *       500:
  *         description: Error liking matchExperience
  */
-router.post("/:id/like", matchExperienceController.likeMatchExperience);
+router.post('/:id/like', matchExperienceController.likeMatchExperience);
 
 /**
  * @swagger
@@ -429,6 +432,6 @@ router.post("/:id/like", matchExperienceController.likeMatchExperience);
  *       500:
  *         description: Error unliking matchExperience
  */
-router.post("/:id/unlike", matchExperienceController.unlikeMatchExperience);
+router.post('/:id/unlike', matchExperienceController.unlikeMatchExperience);
 
 export default router;

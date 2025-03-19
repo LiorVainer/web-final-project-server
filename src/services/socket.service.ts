@@ -58,6 +58,7 @@ export class SocketService {
      */
     private async handleSendMessage(socket: Socket, data: SendMessagePayload) {
         const parsed = SendMessagePayloadSchema.safeParse(data);
+
         if (!parsed.success) {
             throw new Error(`Invalid sendMessage payload: ${parsed.error.format()}`);
         }
