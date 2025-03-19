@@ -177,6 +177,59 @@ router.get('/better-description', matchExperienceController.betterDescription);
 
 /**
  * @swagger
+ * /match-experiences/user/{userId}:
+ *   get:
+ *     summary: Get all match experiences created by a specific user
+ *     tags: [MatchExperiences]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the user whose match experiences are being retrieved
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The page number for pagination (default is 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: The number of items per page (default is 5)
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [date, likes]
+ *         required: false
+ *         description: Sorting criteria (default is "date", alternative is "likes")
+ *     responses:
+ *       200:
+ *         description: A paginated list of match experiences created by the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 experiences:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/MatchExperience'
+ *                 totalPages:
+ *                   type: integer
+ *       404:
+ *         description: No match experiences found for the given user ID
+ *       500:
+ *         description: Error fetching match experiences
+ */
+router.get("/user/:userId", matchExperienceController.getAllByUserId);
+
+/**
+ * @swagger
  * /match-experiences/{id}:
  *   get:
  *     summary: Get a matchExperience by ID

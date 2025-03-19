@@ -82,3 +82,21 @@ export const projectCommentUsersFields = {
         commentUsers: 0,
     },
 };
+
+
+export const projectCommentIds = {
+    $project: {
+        _id: 1, 
+        createdBy: 1, 
+        user: 1, 
+        commentIds: {
+            $map: {
+                input: '$comments',
+                as: 'comment',
+                in: '$$comment._id',
+            },
+        },
+    },
+};
+
+export const likesCountQuery = { $addFields: { likesCount: { $size: "$likes" } } };
