@@ -16,6 +16,13 @@ router.use(authMiddleware);
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *       description: Use your Bearer token for authentication.
+ *
  *   schemas:
  *     Comment:
  *       type: object
@@ -38,7 +45,7 @@ router.use(authMiddleware);
  *           type: string
  *           format: date-time
  *           description: The timestamp when the comment was created
-
+ *
  *     MatchExperience:
  *       type: object
  *       required:
@@ -104,10 +111,18 @@ router.use(authMiddleware);
 
 /**
  * @swagger
+ * security:
+ *   - BearerAuth: []  # This indicates that Bearer token is required for authorization
+ */
+
+/**
+ * @swagger
  * /match-experiences:
  *   post:
  *     summary: Create a new matchExperience
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     requestBody:
  *       required: true
  *       content:
@@ -159,6 +174,8 @@ router.post('/', matchExperienceController.createMatchExperience);
  *   get:
  *     summary: Get all matchExperiences
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     responses:
  *       200:
  *         description: A list of matchExperiences
@@ -181,6 +198,8 @@ router.get('/better-description', matchExperienceController.betterDescription);
  *   get:
  *     summary: Get all match experiences created by a specific user
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     parameters:
  *       - in: path
  *         name: userId
@@ -234,6 +253,8 @@ router.get("/user/:userId", matchExperienceController.getAllByUserId);
  *   get:
  *     summary: Get a matchExperience by ID
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     parameters:
  *       - in: path
  *         name: id
@@ -261,6 +282,8 @@ router.get('/:id', matchExperienceController.getMatchExperienceById);
  *   put:
  *     summary: Update a matchExperience by ID
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     parameters:
  *       - in: path
  *         name: id
@@ -312,6 +335,8 @@ router.put('/:id', matchExperienceController.updateMatchExperience);
  *   delete:
  *     summary: Delete a matchExperience by ID
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     parameters:
  *       - in: path
  *         name: id
@@ -335,6 +360,8 @@ router.delete('/:id', matchExperienceController.deleteMatchExperience);
  *   post:
  *     summary: Add a comment to a matchExperience
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     parameters:
  *       - in: path
  *         name: id
@@ -347,20 +374,10 @@ router.delete('/:id', matchExperienceController.deleteMatchExperience);
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - userId
- *               - content
- *             properties:
- *               userId:
- *                 type: string
- *               content:
- *                 type: string
+ *             $ref: '#/components/schemas/Comment'
  *     responses:
  *       200:
- *         description: The updated matchExperience with the new comment
- *       404:
- *         description: MatchExperience not found
+ *         description: The comment has been added
  *       500:
  *         description: Error adding comment
  */
@@ -372,6 +389,8 @@ router.post('/:id/comments', matchExperienceController.addComment);
  *   post:
  *     summary: Like a matchExperience
  *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     parameters:
  *       - in: path
  *         name: id
@@ -379,59 +398,12 @@ router.post('/:id/comments', matchExperienceController.addComment);
  *           type: string
  *         required: true
  *         description: The matchExperience ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *             properties:
- *               userId:
- *                 type: string
  *     responses:
  *       200:
- *         description: The updated matchExperience with a new like
- *       404:
- *         description: MatchExperience not found
+ *         description: MatchExperience liked
  *       500:
  *         description: Error liking matchExperience
  */
 router.post('/:id/like', matchExperienceController.likeMatchExperience);
-
-/**
- * @swagger
- * /match-experiences/{id}/unlike:
- *   post:
- *     summary: Unlike a matchExperience
- *     tags: [MatchExperiences]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The matchExperience ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - userId
- *             properties:
- *               userId:
- *                 type: string
- *     responses:
- *       200:
- *         description: The updated matchExperience with the like removed
- *       404:
- *         description: MatchExperience not found
- *       500:
- *         description: Error unliking matchExperience
- */
-router.post('/:id/unlike', matchExperienceController.unlikeMatchExperience);
 
 export default router;
