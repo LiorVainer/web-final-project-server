@@ -4,7 +4,7 @@ const port = process.env.PORT;
 
 const main = async () => {
     try {
-        const { server, app } = await initServer();
+        const { server } = await initServer();
         server.listen(port, () => {
             console.log(`server listening at http://localhost:${port}`);
         });

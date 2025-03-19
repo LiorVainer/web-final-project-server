@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { StringToObjectId, zodDate } from '../utils/zod.utils';
+import { StringToObjectId } from '../utils/zod.utils';
 import { PopulatedCommentSchema } from './comment.model';
 import { PublicUserSchema } from './user.model';
 
@@ -45,7 +45,6 @@ export const MatchExperiencePayloadSchema = MatchExperienceWithoutTimestampsSche
 });
 
 export type MatchExperiencePayload = z.infer<typeof MatchExperiencePayloadSchema>;
-
 
 export const MatchExperienceWithUserAndCommentsIdsSchema = MatchExperienceSchema.extend({
     createdBy: PublicUserSchema,

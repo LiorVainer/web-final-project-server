@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import { Express } from 'express';
 import { MatchExperienceRepository } from '../repositories/match-experience.repository';
 import { UserRepository } from '../repositories/user.repository';
-import { MatchExperience, MatchExperiencePayload } from '../models/match-experience.model';
+import { MatchExperiencePayload } from '../models/match-experience.model';
 
 let app: Express;
 let userAccessToken = '';
