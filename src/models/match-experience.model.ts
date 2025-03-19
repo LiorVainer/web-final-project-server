@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { StringToObjectId } from '../utils/zod.utils';
+import { StringToObjectId, zodDate } from '../utils/zod.utils';
 import { PopulatedCommentSchema } from './comment.model';
 import { PublicUserSchema } from './user.model';
 
@@ -39,7 +39,12 @@ export const MatchExperienceWithoutTimestampsSchema = MatchExperienceSchema.omit
     updatedAt: true,
 });
 
-export type MatchExperiencePayload = z.infer<typeof MatchExperienceWithoutTimestampsSchema>;
+export const MatchExperiencePayloadSchema = MatchExperienceWithoutTimestampsSchema.omit({
+    likes: true,
+    createdBy: true,
+});
+
+export type MatchExperiencePayload = z.infer<typeof MatchExperiencePayloadSchema>;
 
 
 export const MatchExperienceWithUserAndCommentsIdsSchema = MatchExperienceSchema.extend({

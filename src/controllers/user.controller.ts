@@ -7,6 +7,7 @@ export const userController = {
     updateUserById: async (req: Request<Record<any, any>, {}, UpdateUserBody>, res: Response) => {
         try {
             const userId = req.params.id;
+            console.log('userId', userId);
             const user = await UserRepository.findById(userId);
             if (!user) {
                 res.status(404).send({ message: 'User not found' });
