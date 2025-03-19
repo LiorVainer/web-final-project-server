@@ -27,6 +27,46 @@ router.use(authMiddleware);
  *     Comment:
  *       type: object
  *       required:
+ *         - _id
+ *         - matchExperienceId
+ *         - userId
+ *         - content
+ *         - createdAt
+ *         - updatedAt
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: The unique identifier of the comment
+ *           example: "67dacda28919860ef0a10384"
+ *         matchExperienceId:
+ *           type: string
+ *           description: The ID of the matchExperience being commented on
+ *           example: "67da9113c748e6d02ba1f469"
+ *         userId:
+ *           type: string
+ *           description: The ID of the user who made the comment
+ *           example: "67dabb1e89aa87b0390c4c6f"
+ *         content:
+ *           type: string
+ *           description: The content of the comment
+ *           example: "vvvv"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The timestamp when the comment was created
+ *           example: "2025-03-19T13:58:58.397Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: The timestamp when the comment was last updated
+ *           example: "2025-03-19T13:58:58.397Z"
+ *         __v:
+ *           type: integer
+ *           description: Version key for document changes tracking
+ *           example: 0
+ *     CommentPayload:
+ *       type: object
+ *       required:
  *         - matchExperienceId
  *         - userId
  *         - content
@@ -94,8 +134,8 @@ router.use(authMiddleware);
  *         comments:
  *           type: array
  *           items:
- *             type: string
- *           description: A list of comment IDs associated with the matchExperience
+ *             $ref: '#/components/schemas/Comment'
+ *           description: A list of comments on the matchExperience
  *         picture:
  *           type: string
  *           description: Optional picture URL for the matchExperience
@@ -245,7 +285,7 @@ router.get('/better-description', matchExperienceController.betterDescription);
  *       500:
  *         description: Error fetching match experiences
  */
-router.get("/user/:userId", matchExperienceController.getAllByUserId);
+router.get('/user/:userId', matchExperienceController.getAllByUserId);
 
 /**
  * @swagger
@@ -374,7 +414,7 @@ router.delete('/:id', matchExperienceController.deleteMatchExperience);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Comment'
+ *             $ref: '#/components/schemas/CommentPayload'
  *     responses:
  *       200:
  *         description: The comment has been added

@@ -9,6 +9,141 @@ const router = express.Router();
  * tags:
  *   name: Auth
  *   description: Auth management API
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *
+ *   schemas:
+ *     PublicUser:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           example: "67daf63a7d59e2068372d409"
+ *         username:
+ *           type: string
+ *           example: "ליאור ויינר"
+ *         email:
+ *           type: string
+ *           example: "liorvainer@gmail.com"
+ *         picture:
+ *           type: string
+ *           format: uri
+ *           example: "https://lh3.googleusercontent.com/a/ACg8ocLl4XDoHxa74SxG48duAid4hed8OHsW41RG-Avsvj1Fj55dntmmCg=s96-c"
+ *         googleId:
+ *           type: string
+ *           example: "113571103984968642366"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-03-19T16:52:10.857Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-03-19T16:52:40.837Z"
+ *         __v:
+ *           type: integer
+ *           example: 3
+ *
+ *     AuthResponse:
+ *       type: object
+ *       properties:
+ *         accessToken:
+ *           type: string
+ *           description: JWT access token for authentication
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *         refreshToken:
+ *           type: string
+ *           description: JWT refresh token
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *         _id:
+ *           type: string
+ *           example: "67daf63a7d59e2068372d409"
+ *         username:
+ *           type: string
+ *           example: "ליאור ויינר"
+ *         email:
+ *           type: string
+ *           example: "liorvainer@gmail.com"
+ *         picture:
+ *           type: string
+ *           format: uri
+ *           example: "https://lh3.googleusercontent.com/a/ACg8ocLl4XDoHxa74SxG48duAid4hed8OHsW41RG-Avsvj1Fj55dntmmCg=s96-c"
+ *         googleId:
+ *           type: string
+ *           example: "113571103984968642366"
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-03-19T16:52:10.857Z"
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           example: "2025-03-19T19:18:05.795Z"
+ *         __v:
+ *           type: integer
+ *           example: 4
+ *
+ *     RegisterUser:
+ *       type: object
+ *       required:
+ *         - email
+ *         - username
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "liorvainer@gmail.com"
+ *         username:
+ *           type: string
+ *           example: "ליאור ויינר"
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: "securepassword123"
+ *         picture:
+ *           type: string
+ *           format: uri
+ *           example: "https://example.com/profile-picture.jpg"
+ *
+ *     LoginUser:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "liorvainer@gmail.com"
+ *         password:
+ *           type: string
+ *           format: password
+ *           example: "securepassword123"
+ *
+ *     RefreshTokenRequest:
+ *       type: object
+ *       required:
+ *         - refreshToken
+ *       properties:
+ *         refreshToken:
+ *           type: string
+ *           description: The refresh token used for generating new access tokens
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *
+ *     LogoutRequest:
+ *       type: object
+ *       required:
+ *         - refreshToken
+ *       properties:
+ *         refreshToken:
+ *           type: string
+ *           description: The refresh token of the user to be logged out
+ *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  */
 
 /**
