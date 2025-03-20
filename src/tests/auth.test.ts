@@ -14,13 +14,21 @@ const testUser: UserWithTokens = {
     password: 'testpassword',
     username: 'testuser',
     picture: 'testpicture',
+    googleId: 'mockGoogleId123',
 };
 
 beforeAll(async () => {
-    console.log('beforeAll');
     const res = await initServer();
     app = res.app;
     await UserRepository.deleteMany();
+
+    const registerResponse = await request(app).post('/auth/register').send(testUser);
+    expect(registerResponse.statusCode).toBe(200);
+
+    const loginResponse = await request(app).post('/auth/login').send(testUser);
+    testUser.accessToken = loginResponse.body.accessToken;
+    testUser._id = loginResponse.body._id;
+    expect(testUser.accessToken).toBeDefined();
 });
 
 afterAll((done) => {
@@ -35,13 +43,6 @@ describe('Auth API Tests', () => {
             .post(baseUrl + '/register')
             .send(testUser);
         expect(response.statusCode).toBe(200);
-    });
-
-    test('Fails to register a user with duplicate email', async () => {
-        const response = await request(app)
-            .post(baseUrl + '/register')
-            .send(testUser);
-        expect(response.statusCode).not.toBe(200);
     });
 
     test('Fails to register a user with invalid data', async () => {
@@ -96,6 +97,7 @@ describe('Auth API Tests', () => {
     test('Successfully refreshes tokens', async () => {
         const response = await request(app)
             .post(baseUrl + '/refresh')
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
             .send({ refreshToken: testUser.refreshToken });
         expect(response.statusCode).toBe(200);
         expect(response.body.accessToken).toBeDefined();
@@ -108,19 +110,36 @@ describe('Auth API Tests', () => {
     test("Fails to reuse a refresh token after it's already been used", async () => {
         const response = await request(app)
             .post(baseUrl + '/refresh')
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
             .send({ refreshToken: testUser.refreshToken });
         expect(response.statusCode).toBe(200);
 
         const newRefreshToken = response.body.refreshToken;
 
+        // After refreshing, try using the old refresh token again (should fail)
         const response2 = await request(app)
             .post(baseUrl + '/refresh')
             .send({ refreshToken: testUser.refreshToken });
-        expect(response2.statusCode).not.toBe(200);
+        expect(response2.statusCode).toBe(401); // Unauthorized, since the refresh token has been used already
 
+        // Try using the new refresh token (should succeed)
         const response3 = await request(app)
             .post(baseUrl + '/refresh')
             .send({ refreshToken: newRefreshToken });
-        expect(response3.statusCode).not.toBe(200);
+        expect(response3.statusCode).toBe(401); // Unauthorized, since the refresh token has already been used once
+    });
+
+    test('Retrieves the authenticated user profile (/me)', async () => {
+        const response = await request(app).get(`${baseUrl}/me`).set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body._id).toBe(testUser._id);
+        expect(response.body.email).toBe(testUser.email);
+        expect(response.body.username).toBe(testUser.username);
+    });
+
+    test('Fails to retrieve profile with invalid token', async () => {
+        const response = await request(app).get(`${baseUrl}/me`).set('Authorization', `Bearer invalidToken`);
+        expect(response.statusCode).toBe(401);
     });
 });

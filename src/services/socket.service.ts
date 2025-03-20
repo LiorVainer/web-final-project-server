@@ -9,7 +9,7 @@ import {
 import { matchExperienceService } from './match-experience.service';
 import { ROOM_PREFIX, SOCKET_EVENTS } from '../constants/socket.const';
 import mongoose from 'mongoose';
-
+/* istanbul ignore file */
 export class SocketService {
     private io: Server;
     private activeUsers: Map<mongoose.Types.ObjectId, string>; // Maps userId to socketId

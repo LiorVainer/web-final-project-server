@@ -622,4 +622,27 @@ router.post('/:id/comments', matchExperienceController.addComment);
  */
 router.post('/:id/like', matchExperienceController.likeMatchExperience);
 
+/**
+ * @swagger
+ * /match-experiences/{id}/unlike:
+ *   post:
+ *     summary: UnLike a match experience
+ *     tags: [MatchExperiences]
+ *     security:
+ *       - BearerAuth: []  # Require Bearer token for this endpoint
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The match experience ID
+ *     responses:
+ *       200:
+ *         description: match experience unliked
+ *       500:
+ *         description: Error unliking match experience
+ */
+router.post('/:id/unlike', matchExperienceController.unlikeMatchExperience);
+
 export default router;

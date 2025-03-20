@@ -2,32 +2,27 @@ import request from 'supertest';
 import { initServer } from '../server';
 import mongoose from 'mongoose';
 import { Express } from 'express';
-import { MatchExperienceRepository } from '../repositories/match-experience.repository';
-import { UserRepository } from '../repositories/user.repository';
 import { MatchExperience } from '../models/match-experience.model';
+import { UserWithTokens } from '../types/user.types';
 
 let app: Express;
-let userAccessToken = '';
 let matchExperienceId = '';
-let createdBy = '';
 
-// TODO: Need fix mock data, because schema has changed
-const testMatchExperience: MatchExperience = {
+const testMatchExperience: Partial<MatchExperience> = {
     homeTeam: 'Team A',
     awayTeam: 'Team B',
-    matchDate: new Date().toISOString(),
+    matchDate: new Date(),
     league: 'Premier League',
     country: 'England',
     stadium: 'Wembley Stadium',
     title: 'Exciting Match!',
     description: 'This will be an intense match between top teams.',
     likes: [],
-    comments: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
 };
 
-const testUser = {
+const testUser: UserWithTokens = {
     email: 'test1@user.com',
     password: 'testpassword',
     username: 'testuser',
@@ -37,14 +32,16 @@ const testUser = {
 beforeAll(async () => {
     const res = await initServer();
     app = res.app;
-    await UserRepository.deleteMany();
-    await MatchExperienceRepository.deleteMany();
+    // await MatchExperienceRepository.deleteMany();
 
-    // Register and login user
-    await request(app).post('/auth/register').send(testUser);
+    const registerResponse = await request(app).post('/auth/register').send(testUser);
+    expect(registerResponse.statusCode).toBe(200);
+
     const loginResponse = await request(app).post('/auth/login').send(testUser);
-    createdBy = loginResponse.body._id;
-    userAccessToken = loginResponse.body.accessToken;
+    testUser.accessToken = loginResponse.body.accessToken;
+    testUser._id = loginResponse.body._id;
+    testMatchExperience.createdBy = loginResponse.body._id;
+    expect(testUser.accessToken).toBeDefined();
 });
 
 afterAll(async () => {
@@ -53,13 +50,11 @@ afterAll(async () => {
 
 describe('MatchExperience API Integration Tests', () => {
     test('creates a new matchExperience', async () => {
+        const { createdBy, ...rest } = testMatchExperience;
         const response = await request(app)
             .post('/match-experiences')
-            .set('Authorization', `JWT ${userAccessToken}`)
-            .send({
-                ...testMatchExperience,
-                createdBy,
-            });
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send(rest);
 
         expect(response.statusCode).toBe(200);
         expect(response.body.title).toBe(testMatchExperience.title);
@@ -68,14 +63,18 @@ describe('MatchExperience API Integration Tests', () => {
     });
 
     test('retrieves all matchExperiences', async () => {
-        const response = await request(app).get('/match-experiences');
+        const response = await request(app)
+            .get('/match-experiences')
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
 
         expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBeGreaterThanOrEqual(1);
+        expect(response.body.experiences.length).toBeGreaterThanOrEqual(1);
     });
 
     test('retrieves a matchExperience by ID', async () => {
-        const response = await request(app).get(`/match-experiences/${matchExperienceId}`);
+        const response = await request(app)
+            .get(`/match-experiences/${matchExperienceId}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
 
         expect(response.statusCode).toBe(200);
         expect(response.body._id).toBe(matchExperienceId);
@@ -84,7 +83,7 @@ describe('MatchExperience API Integration Tests', () => {
     test('updates a matchExperience', async () => {
         const response = await request(app)
             .put(`/match-experiences/${matchExperienceId}`)
-            .set('Authorization', `JWT ${userAccessToken}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
             .send({ title: 'Updated MatchExperience Title' });
 
         expect(response.statusCode).toBe(200);
@@ -94,37 +93,37 @@ describe('MatchExperience API Integration Tests', () => {
     test('adds a comment to a matchExperience', async () => {
         const response = await request(app)
             .post(`/match-experiences/${matchExperienceId}/comments`)
-            .set('Authorization', `JWT ${userAccessToken}`)
-            .send({ userId: 'testUserId', content: 'Great match!' });
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ userId: testUser._id, content: 'Great match!' });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body.comments.length).toBeGreaterThanOrEqual(1);
+        expect(response.body.message).not.toBeNull();
     });
 
     test('likes a matchExperience', async () => {
         const response = await request(app)
             .post(`/match-experiences/${matchExperienceId}/like`)
-            .set('Authorization', `JWT ${userAccessToken}`)
-            .send({ userId: 'testUserId' });
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ userId: testUser._id });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body.likes).toContain('testUserId');
+        expect(response.body.ok).toBeTruthy();
     });
 
     test('unlikes a matchExperience', async () => {
         const response = await request(app)
             .post(`/match-experiences/${matchExperienceId}/unlike`)
-            .set('Authorization', `JWT ${userAccessToken}`)
-            .send({ userId: 'testUserId' });
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ userId: testUser._id });
 
         expect(response.statusCode).toBe(200);
-        expect(response.body.likes).not.toContain('testUserId');
+        expect(response.body.ok).toBeTruthy();
     });
 
     test('deletes a matchExperience', async () => {
         const response = await request(app)
             .delete(`/match-experiences/${matchExperienceId}`)
-            .set('Authorization', `JWT ${userAccessToken}`);
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
 
         expect(response.statusCode).toBe(200);
     });

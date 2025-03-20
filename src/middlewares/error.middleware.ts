@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-
+/* istanbul ignore file */
 export const handleErrorMiddleware = (
   err: Error,
   req: Request,

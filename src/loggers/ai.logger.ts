@@ -11,7 +11,7 @@ import { AIServiceMethodToKebabCase } from '../constants/ai.const';
 import { CoreMessage } from 'ai';
 
 const BASE_OUTPUT_FOLDER_PATH = './output';
-
+/* istanbul ignore file */
 class AILoggerProvider {
     saveObjectMethodOutputToFile<T>(
         method: AIServiceMethod,

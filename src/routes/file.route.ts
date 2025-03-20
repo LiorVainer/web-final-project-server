@@ -35,8 +35,6 @@ const router = express.Router();
  *   post:
  *     summary: Upload a file
  *     tags: [Files]
- *     security:
- *       - BearerAuth: []  # Require Bearer token for this endpoint
  *     requestBody:
  *       required: true
  *       content:

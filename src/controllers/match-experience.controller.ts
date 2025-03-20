@@ -6,7 +6,7 @@ import { CreateCommentDTO } from '../models/comment.model';
 import { matchExperienceService } from '../services/match-experience.service';
 import { AIService } from '../services/ai.service';
 import { formatObject } from '../utils/formatObject.utils';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -30,12 +30,12 @@ export const matchExperienceController = {
         try {
             const page = parseInt(req.query.page as string) || PAGE_DEFAULT;
             const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
-            const sortBy = (req.query.sortBy as string) || "date";
+            const sortBy = (req.query.sortBy as string) || 'date';
     
             const result = await matchExperienceService.getAllMatchExperiences(page, limit, sortBy);
             res.status(200).json(result);
         } catch (err) {
-            res.status(500).json({ error: "Error fetching matchExperiences", details: err });
+            res.status(500).json({ error: 'Error fetching matchExperiences', details: err });
         }
     },
 
@@ -44,7 +44,7 @@ export const matchExperienceController = {
             const userId = req.params.userId;
             const page = parseInt(req.query.page as string) || PAGE_DEFAULT;
             const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
-            const sortBy = (req.query.sortBy as string) || "date";
+            const sortBy = (req.query.sortBy as string) || 'date';
     
             const result = await matchExperienceService.getAllMatchExperiencesByUserId(userId, page, limit, sortBy);
             res.status(200).json(result);
@@ -116,7 +116,6 @@ export const matchExperienceController = {
 
             res.status(200).send(message.id);
         } catch (err) {
-            console.log(err);
             res.status(500).send(err);
         }
     },

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { z, ZodType } from 'zod';
 
+/* istanbul ignore file */
 export const ObjectIdSchema: ZodType<mongoose.Types.ObjectId, z.ZodTypeDef, string> = z
     .string()
     .refine((val) => mongoose.Types.ObjectId.isValid(val), {

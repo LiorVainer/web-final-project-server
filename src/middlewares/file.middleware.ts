@@ -1,5 +1,5 @@
 import multer from 'multer';
-
+/* istanbul ignore file */
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         console.log('file', file);

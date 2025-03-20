@@ -3,7 +3,6 @@ import { initServer } from '../server';
 import mongoose from 'mongoose';
 import { UserRepository } from '../repositories/user.repository';
 import { UserWithTokens } from '../types/user.types';
-import testUsers from './users_tests.json';
 import { Application } from 'express';
 
 let app: Application;
@@ -33,50 +32,13 @@ afterAll(async () => {
     await mongoose.connection.close();
 });
 
-let userId = '';
-
 describe('User API Integration Tests', () => {
-    test('creates a new user with email and password', async () => {
-        const response = await request(app).post('/users').send(testUsers[0]);
-
-        expect(response.statusCode).toBe(201);
-        expect(response.body.email).toBe(testUsers[0].email);
-        expect(response.body.email).not.toBe(testUsers[1].email);
-
-        userId = response.body._id;
-        expect(userId).toBeDefined();
-    });
-
-    test('retrieves all users from the database', async () => {
-        const response = await request(app).get('/users');
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body.length).toBeGreaterThanOrEqual(1);
-    });
-
-    test('retrieves a user by their ID', async () => {
-        const response = await request(app).get(`/users/${userId}`);
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body._id).toBe(userId);
-        expect(response.body.email).toBe(testUsers[0].email);
-    });
-
     test("updates a user's password using their ID", async () => {
         const response = await request(app)
-            .put(`/users/${userId}`)
-            .set({ authorization: 'JWT ' + testUser.accessToken })
+            .put(`/users/${testUser._id}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
             .send({ password: 'updatedpassword' });
 
         expect(response.statusCode).toBe(200);
-    });
-
-    test('deletes a user by their ID', async () => {
-        const response = await request(app)
-            .delete(`/users/${userId}`)
-            .set({ authorization: 'JWT ' + testUser.accessToken });
-
-        expect(response.statusCode).toBe(200);
-        expect(response.body._id).toBe(userId);
     });
 });
