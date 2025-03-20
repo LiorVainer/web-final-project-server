@@ -39,8 +39,12 @@ export const MatchExperienceWithoutTimestampsSchema = MatchExperienceSchema.omit
     updatedAt: true,
 });
 
-export type MatchExperiencePayload = z.infer<typeof MatchExperienceWithoutTimestampsSchema>;
+export const MatchExperiencePayloadSchema = MatchExperienceWithoutTimestampsSchema.omit({
+    likes: true,
+    createdBy: true,
+});
 
+export type MatchExperiencePayload = z.infer<typeof MatchExperiencePayloadSchema>;
 
 export const MatchExperienceWithUserAndCommentsIdsSchema = MatchExperienceSchema.extend({
     createdBy: PublicUserSchema,

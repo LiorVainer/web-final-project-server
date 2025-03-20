@@ -4,6 +4,9 @@ import mongoose from 'mongoose';
 import { Express } from 'express';
 import { MatchExperience } from '../models/match-experience.model';
 import { UserWithTokens } from '../types/user.types';
+import { MatchExperienceRepository } from '../repositories/match-experience.repository';
+import { UserRepository } from '../repositories/user.repository';
+import { MatchExperiencePayload } from '../models/match-experience.model';
 
 let app: Express;
 let matchExperienceId = '';
