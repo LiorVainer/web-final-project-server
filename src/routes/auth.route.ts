@@ -278,12 +278,12 @@ router.post('/login', authController.login);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
- *       400:
+ *       401:
  *         description: Invalid refresh token
  *       500:
  *         description: Server error
  */
-router.post('/refresh', authMiddleware, authController.refresh);
+router.post('/refresh', authController.refresh);
 
 /**
  * @swagger

@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'node:path';
 import { Request, Response } from 'express';
 
-/* istanbul ignore file */
 export const fileController = {
     handleUpload(req: Request, res: Response) {
         const url = req.file?.path.replace(/\\/g, '/');

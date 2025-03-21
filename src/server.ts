@@ -15,6 +15,7 @@ import soccerRoutes from './routes/soccer.route';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import { initializeSocket } from './socket';
+import { ENV } from './env/env.config';
 
 dotenv.config();
 const app = express();
@@ -28,7 +29,7 @@ app.use(bodyParser.json());
 app.use(cors({ origin: '*', credentials: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const port = process.env.PORT;
+const port = ENV.PORT;
 
 const options = {
     definition: {
@@ -69,7 +70,7 @@ app.use('/public', express.static('public'));
 initializeSocket(io);
 
 export const initServer = async () => {
-    const dbConnect = process.env.DB_CONNECT;
+    const dbConnect = ENV.DB_CONNECT;
     if (!dbConnect) {
         throw new Error('DB_CONNECT is not defined in .env file');
     }

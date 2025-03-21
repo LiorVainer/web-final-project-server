@@ -3,6 +3,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 import { Country, League, Team, Venue } from '../types/soccer.types';
 import { calculateCurrentSeason } from '../utils/soccer.utils';
+import { ENV } from '../env/env.config';
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ export const currSeason = calculateCurrentSeason(new Date());
 export const soccerApiClient = axios.create({
     baseURL: 'https://v3.football.api-sports.io',
     headers: {
-        'x-apisports-key': process.env.API_KEY || '',
+        'x-apisports-key': ENV.API_KEY || '',
     },
 });
 

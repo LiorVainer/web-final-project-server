@@ -5,6 +5,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { UserWithTokens } from '../types/user.types';
 import { Application } from 'express';
 import { MatchExperienceWithId } from '../models/match-experience.model';
+import { chatService } from '../services/chat.service';
 
 let app: Application;
 
@@ -84,5 +85,37 @@ describe('Chats API Integration Tests', () => {
             .set('Authorization', `Bearer ${testUser.accessToken}`);
 
         expect(response.statusCode).toBe(200);
+    });
+
+    test('returns 500 if chatService.getChatBetweenUsers throws an error', async () => {
+        const spy = jest
+            .spyOn(chatService, 'getChatBetweenUsers')
+            .mockImplementation(() => Promise.reject(new Error('Internal error')));
+
+        const response = await request(app)
+            .get(
+                `/chat?matchExperienceId=${testMatchExperience._id}&visitorId=${testUser2._id}&matchExperienceCreatorId=${testUser._id}`
+            )
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toHaveProperty('error', 'Error fetching chats');
+
+        spy.mockRestore();
+    });
+
+    test('returns 500 if chatService.getChatsForMatchExperience throws an error', async () => {
+        const spy = jest
+            .spyOn(chatService, 'getChatsForMatchExperience')
+            .mockImplementation(() => Promise.reject(new Error('Internal error')));
+
+        const response = await request(app)
+            .get(`/chat?matchExperienceId=${testMatchExperience._id}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(500);
+        expect(response.body).toHaveProperty('error', 'Error fetching chats');
+
+        spy.mockRestore();
     });
 });

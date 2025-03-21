@@ -5,8 +5,9 @@ import { Express } from 'express';
 import { MatchExperience } from '../models/match-experience.model';
 import { UserWithTokens } from '../types/user.types';
 import { MatchExperienceRepository } from '../repositories/match-experience.repository';
+import { matchExperienceService } from '../services/match-experience.service';
 import { UserRepository } from '../repositories/user.repository';
-import { MatchExperiencePayload } from '../models/match-experience.model';
+import { CommentRepository } from '../repositories/comment.repository';
 
 let app: Express;
 let matchExperienceId = '';
@@ -35,7 +36,9 @@ const testUser: UserWithTokens = {
 beforeAll(async () => {
     const res = await initServer();
     app = res.app;
-    // await MatchExperienceRepository.deleteMany();
+    await MatchExperienceRepository.deleteMany();
+    await CommentRepository.deleteMany();
+    await UserRepository.deleteMany();
 
     const registerResponse = await request(app).post('/auth/register').send(testUser);
     expect(registerResponse.statusCode).toBe(200);
@@ -74,6 +77,28 @@ describe('MatchExperience API Integration Tests', () => {
         expect(response.body.experiences.length).toBeGreaterThanOrEqual(1);
     });
 
+    test('retrieves matchExperiences sorted by likes', async () => {
+        const response = await request(app)
+            .get('/match-experiences?sortBy=likes')
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('experiences');
+        expect(Array.isArray(response.body.experiences)).toBe(true);
+        expect(response.body).toHaveProperty('totalPages');
+    });
+
+    test('retrieves matchExperiences by user sorted by likes', async () => {
+        const response = await request(app)
+            .get(`/match-experiences/user/${testUser._id}?sortBy=likes`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body).toHaveProperty('experiences');
+        expect(Array.isArray(response.body.experiences)).toBe(true);
+        expect(response.body).toHaveProperty('totalPages');
+    });
+
     test('retrieves a matchExperience by ID', async () => {
         const response = await request(app)
             .get(`/match-experiences/${matchExperienceId}`)
@@ -91,6 +116,40 @@ describe('MatchExperience API Integration Tests', () => {
 
         expect(response.statusCode).toBe(200);
         expect(response.body.title).toBe('Updated MatchExperience Title');
+    });
+
+    test('returns 404 when trying to get a non-existent matchExperience by ID', async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .get(`/match-experiences/${nonExistentId}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(404);
+        expect(response.text).toBe('MatchExperience not found');
+    });
+
+    test('returns 404 when trying to update a non-existent matchExperience', async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .put(`/match-experiences/${nonExistentId}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ title: 'This update should fail' });
+
+        expect(response.statusCode).toBe(404);
+        expect(response.text).toBe('MatchExperience not found');
+    });
+
+    test('returns 404 when trying to delete a non-existent matchExperience', async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .delete(`/match-experiences/${nonExistentId}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(404);
+        expect(response.text).toBe('MatchExperience not found');
     });
 
     test('adds a comment to a matchExperience', async () => {
@@ -129,5 +188,69 @@ describe('MatchExperience API Integration Tests', () => {
             .set('Authorization', `Bearer ${testUser.accessToken}`);
 
         expect(response.statusCode).toBe(200);
+    });
+
+    test('returns 404 when trying to like a non-existent matchExperience', async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .post(`/match-experiences/${nonExistentId}/like`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ userId: testUser._id });
+
+        expect(response.statusCode).toBe(404);
+        expect(response.text).toBe('MatchExperience not found');
+    });
+
+    test('returns 404 when trying to unlike a non-existent matchExperience', async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .post(`/match-experiences/${nonExistentId}/unlike`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ userId: testUser._id });
+
+        expect(response.statusCode).toBe(404);
+        expect(response.text).toBe('MatchExperience not found');
+    });
+
+    test('returns 404 when trying to comment on a non-existent matchExperience', async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .post(`/match-experiences/${nonExistentId}/comments`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ userId: testUser._id, content: 'Nice match!' });
+
+        expect(response.statusCode).toBe(404);
+        expect(response.text).toBe('MatchExperience not found');
+    });
+
+    test('returns 500 if error is thrown when retrieving matchExperience by ID', async () => {
+        const spy = jest
+            .spyOn(matchExperienceService, 'getMatchExperienceById')
+            .mockRejectedValueOnce(new Error('DB error'));
+
+        const response = await request(app)
+            .get(`/match-experiences/${new mongoose.Types.ObjectId()}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(500);
+
+        spy.mockRestore();
+    });
+
+    test('returns 500 if error is thrown when retrieving matchExperiences by user ID', async () => {
+        const spy = jest
+            .spyOn(matchExperienceService, 'getAllMatchExperiencesByUserId')
+            .mockRejectedValueOnce(new Error('DB error'));
+
+        const response = await request(app)
+            .get(`/match-experiences/user/${testUser._id}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(500);
+
+        spy.mockRestore();
     });
 });

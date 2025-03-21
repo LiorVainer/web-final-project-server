@@ -3,7 +3,6 @@ import { AIConfig } from '../constants/ai.const';
 import { AIServiceProviderInterface, ObjectMethodConfig, TextMethodConfig } from '../types/ai.types';
 import { AILogger } from '../loggers/ai.logger';
 
-/* istanbul ignore file */
 class AIServiceProvider implements AIServiceProviderInterface {
     async generateText(
         prompt: string,
