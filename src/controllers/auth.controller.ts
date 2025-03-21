@@ -152,7 +152,7 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
     try {
         const user = await verifyRefreshToken(req.body.refreshToken);
         if (!user) {
-            res.status(401).send('Invalid refresh token');
+            res.status(400).send('Invalid refresh token');
             return;
         }
 

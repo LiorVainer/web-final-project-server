@@ -108,12 +108,12 @@ describe('Auth API Tests', () => {
         const response2 = await request(app)
             .post(baseUrl + '/refresh')
             .send({ refreshToken: testUser.refreshToken });
-        expect(response2.statusCode).toBe(401);
+        expect(response2.statusCode).toBe(400);
 
         const response3 = await request(app)
             .post(baseUrl + '/refresh')
             .send({ refreshToken: newRefreshToken });
-        expect(response3.statusCode).toBe(401);
+        expect(response3.statusCode).toBe(400);
     });
 
     test('Retrieves the authenticated user profile (/me)', async () => {

@@ -278,7 +278,7 @@ router.post('/login', authController.login);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AuthResponse'
- *       401:
+ *       400:
  *         description: Invalid refresh token
  *       500:
  *         description: Server error
