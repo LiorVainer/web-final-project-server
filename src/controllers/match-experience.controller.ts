@@ -100,7 +100,8 @@ export const matchExperienceController = {
     addComment: async (req: Request, res: Response) => {
         try {
             const matchExperienceId = req.params.id;
-            const { userId, content } = req.body;
+            const { content } = req.body;
+            const userId = new mongoose.Types.ObjectId(req.userId);
 
             const matchExperience = await MatchExperienceRepository.findById(matchExperienceId);
             if (!matchExperience) {
@@ -125,7 +126,7 @@ export const matchExperienceController = {
     likeMatchExperience: async (req: Request, res: Response) => {
         try {
             const matchExperienceId = req.params.id;
-            const { userId } = req.body;
+            const userId = new mongoose.Types.ObjectId(req.userId);
 
             const matchExperience = await MatchExperienceRepository.findByIdAndUpdate(
                 matchExperienceId,
@@ -145,7 +146,7 @@ export const matchExperienceController = {
     unlikeMatchExperience: async (req: Request, res: Response) => {
         try {
             const matchExperienceId = req.params.id;
-            const { userId } = req.body;
+            const userId = new mongoose.Types.ObjectId(req.userId);
 
             const matchExperience = await MatchExperienceRepository.findByIdAndUpdate(
                 matchExperienceId,

@@ -46,7 +46,6 @@ beforeAll(async () => {
     const loginResponse = await request(app).post('/auth/login').send(testUser);
     testUser.accessToken = loginResponse.body.accessToken;
     testUser._id = loginResponse.body._id;
-    testMatchExperience.createdBy = loginResponse.body._id;
     expect(testUser.accessToken).toBeDefined();
 });
 
@@ -156,7 +155,7 @@ describe('MatchExperience API Integration Tests', () => {
         const response = await request(app)
             .post(`/match-experiences/${matchExperienceId}/comments`)
             .set('Authorization', `Bearer ${testUser.accessToken}`)
-            .send({ userId: testUser._id, content: 'Great match!' });
+            .send({ content: 'Great match!' });
 
         expect(response.statusCode).toBe(200);
         expect(response.body.message).not.toBeNull();
@@ -166,7 +165,7 @@ describe('MatchExperience API Integration Tests', () => {
         const response = await request(app)
             .post(`/match-experiences/${matchExperienceId}/like`)
             .set('Authorization', `Bearer ${testUser.accessToken}`)
-            .send({ userId: testUser._id });
+            .send();
 
         expect(response.statusCode).toBe(200);
         expect(response.body.ok).toBeTruthy();
@@ -176,7 +175,7 @@ describe('MatchExperience API Integration Tests', () => {
         const response = await request(app)
             .post(`/match-experiences/${matchExperienceId}/unlike`)
             .set('Authorization', `Bearer ${testUser.accessToken}`)
-            .send({ userId: testUser._id });
+            .send();
 
         expect(response.statusCode).toBe(200);
         expect(response.body.ok).toBeTruthy();

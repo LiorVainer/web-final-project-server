@@ -52,7 +52,6 @@ beforeAll(async () => {
     testUser.accessToken = loginResponse.body.accessToken;
     testUser._id = loginResponse.body._id;
     testUser2._id = registerResponse2.body._id;
-    testMatchExperience.createdBy = loginResponse.body._id;
     expect(testUser.accessToken).toBeDefined();
 
     const { createdBy, ...rest } = testMatchExperience;
