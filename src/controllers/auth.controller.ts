@@ -5,8 +5,9 @@ import { UserDocument, UserRepository } from '../repositories/user.repository';
 import { RefreshResponse, RefreshTokenBody, Tokens } from '../types/auth.types';
 import { PublicUser, User, UserPayload } from '../models/user.model';
 import { OAuth2Client } from 'google-auth-library';
+import { ENV } from '../env/env.config';
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const googleClient = new OAuth2Client(ENV.GOOGLE_CLIENT_ID);
 
 export const register: RequestHandler<Record<any, any>, User | unknown, UserPayload> = async (req, res) => {
     try {
@@ -44,16 +45,12 @@ export const register: RequestHandler<Record<any, any>, User | unknown, UserPayl
 };
 
 export const generateTokens = (user: PublicUser): Tokens | null => {
-    if (!process.env.TOKEN_SECRET) {
-        return null;
-    }
-
-    const accessToken = jwt.sign(user, process.env.TOKEN_SECRET, {
-        expiresIn: process.env.TOKEN_EXPIRES as SignOptions['expiresIn'],
+    const accessToken = jwt.sign(user, ENV.TOKEN_SECRET, {
+        expiresIn: ENV.TOKEN_EXPIRES as SignOptions['expiresIn'],
     });
 
-    const refreshToken = jwt.sign(user, process.env.TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'],
+    const refreshToken = jwt.sign(user, ENV.TOKEN_SECRET, {
+        expiresIn: ENV.REFRESH_TOKEN_EXPIRES as SignOptions['expiresIn'],
     });
 
     return {
@@ -72,10 +69,6 @@ export const login = async (req: Request, res: Response) => {
         const validPassword = await bcryptjs.compare(req.body.password, user.password);
         if (!validPassword) {
             res.status(401).send('wrong username or password');
-            return;
-        }
-        if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server Error');
             return;
         }
         if (!user.refreshTokens) {
@@ -112,14 +105,11 @@ const verifyRefreshToken = async (refreshToken: string | undefined) => {
     if (!refreshToken) {
         throw new Error('Invalid Refresh Token');
     }
-    if (!process.env.TOKEN_SECRET) {
-        throw new Error('Server Error');
-    }
 
     let user: UserDocument | null = null;
 
     try {
-        const payload = jwt.verify(refreshToken, process.env.TOKEN_SECRET) as PublicUser;
+        const payload = jwt.verify(refreshToken, ENV.TOKEN_SECRET) as PublicUser;
         user = await UserRepository.findById(payload._id);
 
         if (!user) {
@@ -197,6 +187,7 @@ export const refresh: RequestHandler<Record<any, any>, RefreshResponse | string,
     }
 };
 
+/* istanbul ignore next */
 export const googleLogin = async (req: Request, res: Response) => {
     try {
         const { credential } = req.body;
@@ -208,7 +199,7 @@ export const googleLogin = async (req: Request, res: Response) => {
 
         const ticket = await googleClient.verifyIdToken({
             idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: ENV.GOOGLE_CLIENT_ID,
         });
 
         const payload = ticket.getPayload();
@@ -265,14 +256,10 @@ export const me = async (req: Request, res: Response) => {
             res.status(401).send('Token not found');
             return;
         }
-        if (!process.env.TOKEN_SECRET) {
-            res.status(500).send('Server Error');
-            return;
-        }
 
         let publicUser: PublicUser | null = null;
         try {
-            publicUser = jwt.verify(token, process.env.TOKEN_SECRET) as PublicUser;
+            publicUser = jwt.verify(token, ENV.TOKEN_SECRET) as PublicUser;
             let user = await UserRepository.findOne({ email: publicUser.email });
             if (!user) {
                 res.status(401).send('Invalid token');

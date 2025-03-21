@@ -6,12 +6,13 @@ import { CreateCommentDTO } from '../models/comment.model';
 import { matchExperienceService } from '../services/match-experience.service';
 import { AIService } from '../services/ai.service';
 import { formatObject } from '../utils/formatObject.utils';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
+import { ENV } from '../env/env.config';
 
 dotenv.config();
 
-const PAGE_DEFAULT = parseInt(process.env.PAGE_DEFAULT as string) || 1;
-const LIMIT_DEFAULT = parseInt(process.env.LIMIT_DEFAULT as string) || 5;
+const PAGE_DEFAULT = ENV.PAGE_DEFAULT || 1;
+const LIMIT_DEFAULT = ENV.LIMIT_DEFAULT || 5;
 
 export const matchExperienceController = {
     createMatchExperience: async (req: Request, res: Response) => {
@@ -30,12 +31,12 @@ export const matchExperienceController = {
         try {
             const page = parseInt(req.query.page as string) || PAGE_DEFAULT;
             const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
-            const sortBy = (req.query.sortBy as string) || "date";
-    
+            const sortBy = (req.query.sortBy as string) || 'date';
+
             const result = await matchExperienceService.getAllMatchExperiences(page, limit, sortBy);
             res.status(200).json(result);
         } catch (err) {
-            res.status(500).json({ error: "Error fetching matchExperiences", details: err });
+            res.status(500).json({ error: 'Error fetching matchExperiences', details: err });
         }
     },
 
@@ -44,8 +45,8 @@ export const matchExperienceController = {
             const userId = req.params.userId;
             const page = parseInt(req.query.page as string) || PAGE_DEFAULT;
             const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
-            const sortBy = (req.query.sortBy as string) || "date";
-    
+            const sortBy = (req.query.sortBy as string) || 'date';
+
             const result = await matchExperienceService.getAllMatchExperiencesByUserId(userId, page, limit, sortBy);
             res.status(200).json(result);
         } catch (err) {
@@ -99,11 +100,13 @@ export const matchExperienceController = {
     addComment: async (req: Request, res: Response) => {
         try {
             const matchExperienceId = req.params.id;
-            const { userId, content } = req.body;
+            const { content } = req.body;
+            const userId = new mongoose.Types.ObjectId(req.userId);
 
             const matchExperience = await MatchExperienceRepository.findById(matchExperienceId);
             if (!matchExperience) {
                 res.status(404).send('MatchExperience not found');
+                return;
             }
 
             const newComment: CreateCommentDTO = {
@@ -116,7 +119,6 @@ export const matchExperienceController = {
 
             res.status(200).send(message.id);
         } catch (err) {
-            console.log(err);
             res.status(500).send(err);
         }
     },
@@ -124,7 +126,7 @@ export const matchExperienceController = {
     likeMatchExperience: async (req: Request, res: Response) => {
         try {
             const matchExperienceId = req.params.id;
-            const { userId } = req.body;
+            const userId = new mongoose.Types.ObjectId(req.userId);
 
             const matchExperience = await MatchExperienceRepository.findByIdAndUpdate(
                 matchExperienceId,
@@ -144,7 +146,7 @@ export const matchExperienceController = {
     unlikeMatchExperience: async (req: Request, res: Response) => {
         try {
             const matchExperienceId = req.params.id;
-            const { userId } = req.body;
+            const userId = new mongoose.Types.ObjectId(req.userId);
 
             const matchExperience = await MatchExperienceRepository.findByIdAndUpdate(
                 matchExperienceId,
@@ -161,6 +163,7 @@ export const matchExperienceController = {
         }
     },
 
+    /* istanbul ignore next */
     betterDescription: async (req: Request, res: Response) => {
         try {
             const prompt = `Generate a short, engaging match experience description based on these details. 

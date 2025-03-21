@@ -9,6 +9,8 @@
     "test:auth": "jest --detectOpenHandles --forceExit tests/auth.test.ts",
     "test:users": "jest --detectOpenHandles --forceExit tests/users.test.ts",
     "test:match-experiences": "jest --detectOpenHandles --forceExit tests/match-experiences.test.ts",
+    "test:chats": "jest --detectOpenHandles --forceExit tests/chats.test.ts",
+    "test:soccer": "jest --detectOpenHandles --forceExit tests/soccer.test.ts",
     "test:coverage": "jest --coverage --runInBand --coverageDirectory=coverage"
   },
   "dependencies": {

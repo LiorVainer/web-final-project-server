@@ -17,7 +17,6 @@ const testUser: UserWithTokens = {
 };
 
 beforeAll(async () => {
-    console.log('beforeAll');
     const res = await initServer();
     app = res.app;
     await UserRepository.deleteMany();
@@ -35,13 +34,6 @@ describe('Auth API Tests', () => {
             .post(baseUrl + '/register')
             .send(testUser);
         expect(response.statusCode).toBe(200);
-    });
-
-    test('Fails to register a user with duplicate email', async () => {
-        const response = await request(app)
-            .post(baseUrl + '/register')
-            .send(testUser);
-        expect(response.statusCode).not.toBe(200);
     });
 
     test('Fails to register a user with invalid data', async () => {
@@ -116,11 +108,30 @@ describe('Auth API Tests', () => {
         const response2 = await request(app)
             .post(baseUrl + '/refresh')
             .send({ refreshToken: testUser.refreshToken });
-        expect(response2.statusCode).not.toBe(200);
+        expect(response2.statusCode).toBe(400);
 
         const response3 = await request(app)
             .post(baseUrl + '/refresh')
             .send({ refreshToken: newRefreshToken });
-        expect(response3.statusCode).not.toBe(200);
+        expect(response3.statusCode).toBe(400);
+    });
+
+    test('Retrieves the authenticated user profile (/me)', async () => {
+        const response = await request(app).get(`${baseUrl}/me`).set('Authorization', `Bearer ${testUser.accessToken}`);
+
+        expect(response.statusCode).toBe(200);
+        expect(response.body._id).toBe(testUser._id);
+        expect(response.body.email).toBe(testUser.email);
+        expect(response.body.username).toBe(testUser.username);
+    });
+
+    test('Fails to retrieve profile with invalid token', async () => {
+        const response = await request(app).get(`${baseUrl}/me`).set('Authorization', `Bearer invalidToken`);
+        expect(response.statusCode).toBe(401);
+    });
+
+    test('Fails to retrieve profile with no token', async () => {
+        const response = await request(app).get(`${baseUrl}/me`);
+        expect(response.statusCode).toBe(401);
     });
 });

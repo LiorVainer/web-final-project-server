@@ -36,9 +36,32 @@ describe('User API Integration Tests', () => {
     test("updates a user's password using their ID", async () => {
         const response = await request(app)
             .put(`/users/${testUser._id}`)
-            .set({ authorization: 'JWT ' + testUser.accessToken })
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
             .send({ password: 'updatedpassword' });
 
         expect(response.statusCode).toBe(200);
+    });
+
+    test('returns 404 when trying to update a non-existent user', async () => {
+        const nonExistentId = new mongoose.Types.ObjectId();
+
+        const response = await request(app)
+            .put(`/users/${nonExistentId}`)
+            .set('Authorization', `Bearer ${testUser.accessToken}`)
+            .send({ password: 'updatedpassword' });
+
+        expect(response.statusCode).toBe(404);
+        expect(response.body).toHaveProperty('message', 'User not found');
+    });
+
+    test('returns 401 when trying to update a user with an invalid JWT', async () => {
+        const invalidToken = 'invalid.jwt.token';
+
+        const response = await request(app)
+            .put(`/users/${testUser._id}`)
+            .set('Authorization', `Bearer ${invalidToken}`)
+            .send({ password: 'updatedpassword' });
+
+        expect(response.statusCode).toBe(401);
     });
 });

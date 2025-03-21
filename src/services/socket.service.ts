@@ -12,7 +12,7 @@ import mongoose from 'mongoose';
 
 export class SocketService {
     private io: Server;
-    private activeUsers: Map<mongoose.Types.ObjectId, string>; // Maps userId to socketId
+    private activeUsers: Map<mongoose.Types.ObjectId, string>;
 
     constructor(io: Server) {
         this.io = io;

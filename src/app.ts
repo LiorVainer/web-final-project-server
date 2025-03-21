@@ -1,6 +1,7 @@
 import { initServer } from './server';
+import { ENV } from './env/env.config';
 
-const port = process.env.PORT;
+const port = ENV.PORT;
 
 const main = async () => {
     try {

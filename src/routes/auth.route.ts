@@ -283,7 +283,7 @@ router.post('/login', authController.login);
  *       500:
  *         description: Server error
  */
-router.post('/refresh', authMiddleware, authController.refresh);
+router.post('/refresh', authController.refresh);
 
 /**
  * @swagger
