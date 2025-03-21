@@ -13,7 +13,6 @@ import {
     unwindUser,
 } from '../queries/match-experience.query';
 
-// Service function
 class MatchExperienceService {
     getMatchExperienceById = async (id: string) => {
         try {
