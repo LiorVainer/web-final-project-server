@@ -42,7 +42,7 @@ export const matchExperienceController = {
 
     getAllByUserId: async (req: Request, res: Response) => {
         try {
-            const userId = req.params.userId;
+            const userId = req.userId;
             const page = parseInt(req.query.page as string) || PAGE_DEFAULT;
             const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
             const sortBy = (req.query.sortBy as string) || 'date';
