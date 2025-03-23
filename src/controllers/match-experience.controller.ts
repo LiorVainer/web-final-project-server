@@ -47,8 +47,12 @@ export const matchExperienceController = {
             const limit = parseInt(req.query.limit as string) || LIMIT_DEFAULT;
             const sortBy = (req.query.sortBy as string) || 'date';
 
-            const result = await matchExperienceService.getAllMatchExperiencesByUserId(userId, page, limit, sortBy);
-            res.status(200).json(result);
+            if (userId) {
+                const result = await matchExperienceService.getAllMatchExperiencesByUserId(userId, page, limit, sortBy);
+                res.status(200).json(result);
+                return
+            }
+            res.status(500).json({ error: 'Error fetching match experiences for user'});
         } catch (err) {
             res.status(500).json({ error: `Error fetching match experiences for user`, details: err });
         }
