@@ -12,22 +12,22 @@ import { handleErrorMiddleware } from './middlewares/error.middleware';
 import fileRoutes from './routes/file.route';
 import chatRoutes from './routes/chat.route';
 import soccerRoutes from './routes/soccer.route';
-import { createServer } from 'http';
-import { Server as SocketIOServer } from 'socket.io';
-import { initializeSocket } from './socket';
 import { ENV } from './env/env.config';
 
 dotenv.config();
-const app = express();
+export const app = express();
 
-const server = createServer(app);
-const io = new SocketIOServer(server, {
-    cors: { origin: '*', methods: ['GET', 'POST'] },
-});
 
 app.use(bodyParser.json());
 app.use(cors({ origin: '*', credentials: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "*");
+    res.header("Access-Control-Allow-Methods", "*");
+    next();
+  });
+
 
 const port = ENV.PORT;
 
@@ -39,7 +39,7 @@ const options = {
             version: '1.0.0',
             description: 'REST server including authentication using JWT',
         },
-        servers: [{ url: `http://localhost:${port}` }],
+        servers: [{ url: `http://localhost:${port}` }, { url: `http://10.10.246.116:${port}` }, { url: `https://node116.cs.colman.ac.il` }],
         components: {
             securitySchemes: {
                 BearerAuth: {
@@ -67,17 +67,25 @@ app.use('/soccer', soccerRoutes);
 app.use('/file', fileRoutes);
 app.use('/public', express.static('public'));
 
-initializeSocket(io);
+// if (ENV.NODE_ENV === 'production') {
+//     const buildPath = path.normalize(path.join(__dirname, '../front'));
+//     app.use(express.static(buildPath));
+
+//     app.get('(/*)?', async (_req, res) => {
+//       res.sendFile(path.join(buildPath, 'index.html'));
+//     });
+//   }
+
 
 export const initServer = async () => {
     const dbConnect = ENV.DB_CONNECT;
-    if (!dbConnect) {
-        throw new Error('DB_CONNECT is not defined in .env file');
-    }
+    console.log(dbConnect);
+    
 
-    try {
+    try {        
         await mongoose.connect(dbConnect);
-        return { server, app };
+        console.log('✅ MongoDB connected');
+        return app;
     } catch (error) {
         throw error;
     }
