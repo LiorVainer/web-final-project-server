@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { StringToObjectId } from '../utils/zod.utils';
-import { UserWithId } from './user.model';
+import { UserWithIdSchema } from './user.model';
 
 export const CommentSchema = z.object({
     matchExperienceId: StringToObjectId,
@@ -11,7 +11,7 @@ export const CommentSchema = z.object({
 });
 
 export const PopulatedCommentSchema = CommentSchema.extend({
-    user: UserWithId,
+    user: UserWithIdSchema,
 });
 
 export type PopulatedComment = z.infer<typeof PopulatedCommentSchema>;
