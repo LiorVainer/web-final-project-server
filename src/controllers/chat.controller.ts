@@ -27,7 +27,6 @@ export const chatController = {
             res.status(200).json(chats);
             return;
         } catch (error) {
-            console.error('Error fetching chats:', error);
             res.status(500).json({ error: 'Error fetching chats' });
             return;
         }

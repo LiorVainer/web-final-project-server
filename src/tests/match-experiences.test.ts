@@ -34,8 +34,7 @@ const testUser: UserWithTokens = {
 };
 
 beforeAll(async () => {
-    const res = await initServer();
-    app = res.app;
+    app = await initServer();
     await MatchExperienceRepository.deleteMany();
     await CommentRepository.deleteMany();
     await UserRepository.deleteMany();
