@@ -15,8 +15,7 @@ const testUser: UserWithTokens = {
 };
 
 beforeAll(async () => {
-    const res = await initServer();
-    app = res.app;
+    app = await initServer();
     await UserRepository.deleteMany();
 
     const registerResponse = await request(app).post('/auth/register').send(testUser);

@@ -29,7 +29,6 @@ class ChatService {
                 matchExperienceCreatorId,
             };
         } catch (error) {
-            console.error('Error fetching chat:', error);
             throw new Error('Error fetching chat');
         }
     }
@@ -49,7 +48,6 @@ class ChatService {
                 matchExperienceCreatorId: chat.matchExperienceCreatorId._id,
             }));
         } catch (error) {
-            console.error('Error fetching chats:', error);
             throw new Error('Error fetching chats for match experience');
         }
     }
