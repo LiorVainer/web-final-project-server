@@ -3,13 +3,7 @@ import { ChatRepository } from '../repositories/chat.repository';
 class ChatService {
     async getChatBetweenUsers(matchExperienceId: string, visitorId: string, matchExperienceCreatorId: string) {
         try {
-            let chat = await ChatRepository.findOne({
-                matchExperienceId,
-                visitorId,
-                matchExperienceCreatorId,
-            })
-                .populate('matchExperienceCreatorId', 'username picture')
-                .populate('visitorId', 'username picture');
+            let chat = await this.findChatBetweenUsers(matchExperienceId, visitorId, matchExperienceCreatorId);
 
             if (!chat) {
                 chat = new ChatRepository({
@@ -19,6 +13,12 @@ class ChatService {
                     messages: [],
                 });
                 await chat.save();
+
+                chat = await this.findChatBetweenUsers(matchExperienceId, visitorId, matchExperienceCreatorId);
+            }
+
+            if (!chat) {
+                throw new Error('Error fetching chat');
             }
 
             return {
@@ -52,6 +52,16 @@ class ChatService {
             console.error('Error fetching chats:', error);
             throw new Error('Error fetching chats for match experience');
         }
+    }
+
+    private async findChatBetweenUsers(matchExperienceId: string, visitorId: string, matchExperienceCreatorId: string) {
+        return ChatRepository.findOne({
+            matchExperienceId,
+            visitorId,
+            matchExperienceCreatorId,
+        })
+            .populate('matchExperienceCreatorId', 'username picture')
+            .populate('visitorId', 'username picture');
     }
 }
 
