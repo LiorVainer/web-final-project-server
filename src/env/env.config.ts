@@ -5,7 +5,6 @@ dotenv.config();
 
 export const EnvSchema = z.object({
     PORT: z.coerce.number().default(3000),
-    HTTPS_PORT: z.coerce.number().default(443),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     BASE_URL: z.string(),
 
